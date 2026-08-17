@@ -1,62 +1,51 @@
 ---
 name: create-yango-banners
-description: Generate finished, editable Yango or Yandex Go performance and in-app/CRM banner packs from a campaign brief or source image. Use when the user asks to create paid-social banners, app showcases, fullscreen CRM, feed, promo, ticket, or WhatsApp placements; generate a suitable source visual; receive individual assets and a ZIP archive; or get a Yango Creative Machine deep link for later edits.
+description: Generate, edit, and render finished Yango-family creative assets through Yango Creative Machine. Use for Ride-hailing, Rides for Business, Yango Drive, Yango Motors, or RIDA source images; Photo, Drivers, Yandex Pro or YANGO PRO illustrations, 3D, Lucky, Reference Scene, or Edit workflows; performance and in-app/CRM banner packs; ZIP archives; and editable builder links.
 ---
 
-# Create Yango Banners
+# Create Yango Creatives
 
-Turn a brief or source image into a complete banner matrix. Return the rendered assets, ZIP archive, and editable Creative Machine link.
+Choose the exact image-generation or edit mode, verify the source, render the requested matrix, and return real asset and editor links.
 
-## Workflow
+## Route the source workflow
 
-1. Determine whether the user supplied a source image URL, an attached/local image, or only a brief.
-2. If the user supplied an attached/local JPEG, PNG, or WebP, encode it as a Base64 data URL and call `upload_source_image`. Pass the exact returned `image_url` to the selected renderer. Do not use a local filesystem path as a source-image URL. Keep decoded uploads at or below 20 MB.
-3. If no source image exists, gather only the missing inputs required by the image-generation tool:
-   - For a photo, require a brief, country, and vehicle model.
-   - For a driver scene, also require the transport label.
-   - For Yango Drive, also require the city.
-   - For a 3D visual, require only the object or scene brief.
-4. Call the capability-discovery tool when the requested brand, layout, style, size, or placement may be unsupported. Treat the returned capabilities as authoritative.
-5. Generate a source image only when needed. Use the exact returned image URL; never invent, normalize, or rewrite it.
-6. Visually inspect a newly generated or uploaded source image before rendering when image inspection is available. Verify the requested people, setting, vehicle, pose, safety details, and usable text space. Do not spend a render on a clearly unsuitable source.
-7. Select the renderer:
-   - Use the performance renderer for paid-social and performance sizes.
-   - Use the in-app renderer for CRM, showcase, fullscreen, feed, promo, ticket, and WhatsApp placements.
-8. Build the requested matrix:
-   - Convert every performance copy variation into a separate text set. When sizes are omitted, request all four supported performance sizes.
-   - Pass the requested in-app placements. When placements are omitted, request the six main consumer placements.
-9. Position the source image when the default crop does not keep the subject well framed:
-   - Use global scale and shifts only when the same adjustment works for the complete pack.
-   - Prefer per-output image overrides when different aspect ratios need different crops. Target performance overrides by text-set index and size; target in-app overrides by placement.
-   - Use scale percentages and 50-pixel shift increments. Positive X moves the image right; positive Y moves it down.
-   - Re-render with the same source image after a positioning adjustment. Do not generate a replacement source merely to fix a crop.
-10. Wait for the same render request to finish. Do not start duplicate work merely because adaptive crops or uncrops take longer.
-11. Verify that the result reports `status: ready` and contains at least one asset URL. When practical, confirm that the ZIP contains the expected number of files and inspect one square and one vertical result. If a subject is clipped or poorly balanced, adjust only the affected outputs and verify them again.
-12. Report the result with:
-   - A concise completion summary.
-   - Every asset grouped by copy variation and size or placement.
-   - The ZIP URL, when returned.
-   - The `edit_url`, explicitly labeled as the link for continuing edits.
-   - Any renderer warning or omitted format.
+1. Use an existing public/Yango-hosted image URL unchanged when the user supplies one.
+2. For an attached/local JPEG, PNG, or WebP up to 20 MB, encode it as a Base64 data URL and call `upload_source_image`. Never pass a local path as a remote source URL.
+3. Call `generate_source_image` for generation, using this routing:
+   - `photo`: Require country, vehicle model, and tariff/transport label. Use for ordinary Ride-hailing or Rides for Business photography.
+   - `drivers`: Require country, vehicle model, tariff, and a driver-focused brief. Use only with Ride-hailing.
+   - `yandex-pro`: Require a scene brief and at least one Yandex Pro scene ingredient. Use an approved background color.
+   - `yango-pro-illustrations`: Require a scene brief and exactly one scene focus. Optionally select its exact reference and skin-tone palette.
+   - `3d`: Require only the object or scene brief.
+   - `lucky`: Require country, vehicle model, tariff, and the campaign idea. Default to four variants and one or more Lucky styles; use split and feedback only when requested or iterating.
+   - `reference-scene`: Upload references first, preserve their returned order, and describe them as Image 1, Image 2, and so on in the scenario.
+4. Use service-specific Photo generation for:
+   - `rides-for-business`: country, business vehicle/tariff, and B2B brief.
+   - `yango-drive`: country, city, vehicle model, optional color, angles, and variant count.
+   - `yango-motors`: vehicle model, optional angle, weather, and location wish.
+   - `rida`: one or more RIDA items, each containing a brief, role (`user`, `driver`, or `none`), and transport (`car`, `moto`, or `none`).
+5. Call `edit_source_image` for Edit mode. Supply the source URL, precise edit instruction, optional reference URL, and desired ratio. Reuse the returned URL for further edits or rendering.
+6. Call `regenerate_source_image` only when rerunning an already finalized prompt. Do not use it to translate a new campaign brief.
+7. Call `get_banner_capabilities` when a requested service, style, brand, size, placement, or option may be unsupported. Treat it as authoritative.
 
-## Defaults
+## Verify and render
 
-- Use brand `yango`, image service `ride-hailing`, style `photo`, and English copy unless the brief says otherwise.
-- Use performance layout `photo`.
-- For in-app work, use service `taxi`, layout `fade`, automatic text color, and the six default consumer placements.
-- Use a left-side icon when badge text is empty. Use a badge only when it contains text.
-- Keep image positioning at 100% scale and zero shift unless inspection shows a composition problem. Performance photo layouts support 100–150% scale, frame layouts 100–350%, and in-app placements 50–180%; shifts range from -400 to 400 pixels.
-- Use `free composition` when the user gives no composition direction.
-- Preserve supplied headline, subtitle, disclaimer, locale, and capitalization verbatim unless the user explicitly requests copywriting or translation.
-- Use `**text**` only when the user asks for an accent-color highlight and the renderer documents that syntax.
+1. Inspect every generated or edited source when image inspection is available. Check the requested people, identity, vehicle, setting, action, safety details, references, and usable text space.
+2. Choose the renderer:
+   - Use `render_banner_pack` for paid-social/performance formats.
+   - Use `render_in_app_pack` for CRM, showcase, fullscreen, feed, promo, ticket, or WhatsApp placements.
+3. Convert each performance copy variation into a separate text set. Default to all four performance sizes when none are specified.
+4. For in-app work, pass requested placements; default to the six main consumer placements. Use a left-side icon when badge text is empty and a badge only when it contains text.
+5. Keep positioning at 100% and zero shift unless inspection shows a problem. Use one global adjustment only when it works for the entire pack; otherwise use per-output overrides. Positive X moves right, positive Y moves down, and shifts use 50-pixel increments.
+6. Re-render with the same source after crop changes. Do not generate another paid source merely to fix positioning.
+7. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
+8. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
 
-## Reliability and Safety
+## Reliability and safety
 
-- Do not claim success before the selected renderer returns a ready result and real asset URLs.
-- Treat uploading as non-destructive but state-changing: upload only an image the user supplied or explicitly approved.
-- Never fabricate or reconstruct asset, archive, source-image, or edit URLs.
-- Do not expose credentials, authorization headers, internal errors, or local configuration.
-- Do not retry paid image generation after an ambiguous timeout without explicit user approval. The first request may still be running.
-- Retry a transient render or ZIP failure at most once because it reuses the existing source image.
-- If authentication fails, identify whether access to the MCP service or the upstream Yango service failed without revealing secrets.
-- If a source URL is protected or inaccessible, request an accessible URL or use the exact internal path supported by the service; do not guess a replacement.
+- Treat generation and editing as potentially paid operations. Do not retry them after an ambiguous timeout without explicit approval.
+- Treat upload as state-changing: upload only user-supplied or explicitly approved media.
+- Retry a transient render or ZIP failure at most once because it reuses the source.
+- Never fabricate, normalize, or reconstruct source, asset, ZIP, or editor URLs.
+- Do not expose credentials, authorization headers, internal traces, or local configuration.
+- If authentication fails, distinguish MCP access from upstream Yango access without revealing secrets.
