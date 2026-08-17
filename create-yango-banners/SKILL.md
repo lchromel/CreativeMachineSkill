@@ -45,9 +45,11 @@ Choose the exact image-generation or edit mode, preserve editable states, verify
 3. Convert each performance copy variation into a separate text set. Default to all four performance sizes when none are specified.
 4. For in-app work, pass requested placements; default to the six main consumer placements. Use a left-side icon when badge text is empty and a badge only when it contains text.
 5. Keep positioning at 100% and zero shift unless inspection shows a problem. Use one global adjustment only when it works for the entire pack; otherwise use per-output overrides. Positive X moves right, positive Y moves down, and shifts use 50-pixel increments.
-6. Re-render with the same source after crop changes. Do not generate another paid source merely to fix positioning.
-7. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
-8. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
+6. For a performance badge, set `badge_shift_x`, `badge_shift_y`, and `badge_scale_percent` on its text set. Shifts are relative values from 0 to 100 in steps of 5; scale is 70–150% in steps of 5. Use `badge_overrides` when a specific text-set/size output needs different values.
+7. When revising a performance `edit_url`, use the same badge fields in `performance_text_updates` for the text-set default and `performance_badge_overrides` for individual sizes. Preserve all unspecified badge overrides.
+8. Re-render with the same source after image or badge-position changes. Do not generate another paid source merely to fix positioning.
+9. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
+10. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
 
 ## Share to Yandex Disk
 
