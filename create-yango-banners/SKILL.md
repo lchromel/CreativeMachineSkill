@@ -1,15 +1,23 @@
 ---
 name: create-yango-banners
-description: Generate, edit, and render finished Yango-family creative assets through Yango Creative Machine. Use for Ride-hailing, Rides for Business, Yango Drive, Yango Motors, or RIDA source images; Photo, Drivers, Yandex Pro or YANGO PRO illustrations, 3D, Lucky, Reference Scene, or Edit workflows; performance and in-app/CRM banner packs; ZIP archives; and editable builder links.
+description: Generate, edit, revise, and render finished Yango-family creative assets through Yango Creative Machine. Use for Ride-hailing, Rides for Business, Yango Drive, Yango Motors, or RIDA source images; Photo, Drivers, Yandex Pro or YANGO PRO illustrations, 3D, Lucky, Reference Scene, or Edit workflows; rebuilding flattened banners; revising existing builder links field-by-field; performance and in-app/CRM banner packs; ZIP archives; and editable builder links.
 ---
 
 # Create Yango Creatives
 
-Choose the exact image-generation or edit mode, verify the source, render the requested matrix, and return real asset and editor links.
+Choose the exact image-generation or edit mode, preserve editable states, verify the source, render the requested matrix, and return real asset and editor links.
+
+## Route existing banner revisions first
+
+1. Check whether the user supplied an `edit_url` before treating a banner as an image.
+2. When an `edit_url` exists, call `revise_banner_from_edit_link`. Patch only the requested text, brand, layout, badge, source, placement, or positioning fields. Keep omitted fields unchanged, render the saved `perf` or `crm` section, and return the newly created `edit_url`. Do not upload a screenshot, run OCR, or use image Edit merely to change editable fields.
+3. When no `edit_url` exists and the supplied PNG/JPEG/WebP is a flattened banner with image, text, logo, or disclaimer baked into one raster, route it through `edit_source_image` (Creative Machine Edit mode).
+4. For a flattened banner whose copy or logo must become editable, first use `edit_source_image` to remove the baked text/logo/disclaimer and reconstruct the background. Then pass the cleaned source to `render_banner_pack` or `render_in_app_pack` with the new fields. Do not place fresh editable copy on top of old baked copy.
+5. For a purely visual pixel change to a flattened banner, return the Edit result directly unless the user also requests a reusable editable pack.
 
 ## Route the source workflow
 
-1. Use an existing public/Yango-hosted image URL unchanged when the user supplies one.
+1. Use an existing public/Yango-hosted source-image URL unchanged when the user supplies one. Apply the existing-banner rules above when the URL points to a finished banner.
 2. For an attached/local JPEG, PNG, or WebP up to 20 MB, encode it as a Base64 data URL and call `upload_source_image`. Never pass a local path as a remote source URL.
 3. Call `generate_source_image` for generation, using this routing:
    - `photo`: Require country, vehicle model, and tariff/transport label. Use for ordinary Ride-hailing or Rides for Business photography.
@@ -24,7 +32,7 @@ Choose the exact image-generation or edit mode, verify the source, render the re
    - `yango-drive`: country, city, vehicle model, optional color, angles, and variant count.
    - `yango-motors`: vehicle model, optional angle, weather, and location wish.
    - `rida`: one or more RIDA items, each containing a brief, role (`user`, `driver`, or `none`), and transport (`car`, `moto`, or `none`).
-5. Call `edit_source_image` for Edit mode. Supply the source URL, precise edit instruction, optional reference URL, and desired ratio. Reuse the returned URL for further edits or rendering.
+5. Call `edit_source_image` for Edit mode. Supply the source URL, precise edit instruction, optional reference URL, and desired ratio. Reuse the returned URL for further edits or rendering. Never use this tool for field-only changes when an `edit_url` exists.
 6. Call `regenerate_source_image` only when rerunning an already finalized prompt. Do not use it to translate a new campaign brief.
 7. Call `get_banner_capabilities` when a requested service, style, brand, size, placement, or option may be unsupported. Treat it as authoritative.
 

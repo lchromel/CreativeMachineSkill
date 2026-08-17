@@ -1,12 +1,12 @@
 interface:
   display_name: "Yango Creative Machine"
   short_description: "Generate, edit, and render Yango creatives"
-  default_prompt: "Use $create-yango-banners to generate or edit a source image and build an editable Yango banner pack."
+  default_prompt: "Use $create-yango-banners to generate, rebuild, or revise an editable Yango banner pack from an image or edit link."
 dependencies:
   tools:
     - type: "mcp"
       value: "yango-creative-machine"
-      description: "Generate, edit, upload, and render editable Yango creative assets"
+      description: "Generate, edit, revise saved fields, upload, and render editable Yango creative assets"
       transport: "streamable_http"
       url: "https://creativemachiemcp-production.up.railway.app/mcp"
 policy:
