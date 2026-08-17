@@ -9,29 +9,30 @@ Turn a brief or source image into a complete banner matrix. Return the rendered 
 
 ## Workflow
 
-1. Determine whether the user supplied a usable source image URL.
-2. If no source image exists, gather only the missing inputs required by the image-generation tool:
+1. Determine whether the user supplied a source image URL, an attached/local image, or only a brief.
+2. If the user supplied an attached/local JPEG, PNG, or WebP, encode it as a Base64 data URL and call `upload_source_image`. Pass the exact returned `image_url` to the selected renderer. Do not use a local filesystem path as a source-image URL. Keep decoded uploads at or below 20 MB.
+3. If no source image exists, gather only the missing inputs required by the image-generation tool:
    - For a photo, require a brief, country, and vehicle model.
    - For a driver scene, also require the transport label.
    - For Yango Drive, also require the city.
    - For a 3D visual, require only the object or scene brief.
-3. Call the capability-discovery tool when the requested brand, layout, style, size, or placement may be unsupported. Treat the returned capabilities as authoritative.
-4. Generate a source image only when needed. Use the exact returned image URL; never invent, normalize, or rewrite it.
-5. Visually inspect a newly generated source image before rendering when image inspection is available. Verify the requested people, setting, vehicle, pose, safety details, and usable text space. Do not spend a render on a clearly unsuitable source.
-6. Select the renderer:
+4. Call the capability-discovery tool when the requested brand, layout, style, size, or placement may be unsupported. Treat the returned capabilities as authoritative.
+5. Generate a source image only when needed. Use the exact returned image URL; never invent, normalize, or rewrite it.
+6. Visually inspect a newly generated or uploaded source image before rendering when image inspection is available. Verify the requested people, setting, vehicle, pose, safety details, and usable text space. Do not spend a render on a clearly unsuitable source.
+7. Select the renderer:
    - Use the performance renderer for paid-social and performance sizes.
    - Use the in-app renderer for CRM, showcase, fullscreen, feed, promo, ticket, and WhatsApp placements.
-7. Build the requested matrix:
+8. Build the requested matrix:
    - Convert every performance copy variation into a separate text set. When sizes are omitted, request all four supported performance sizes.
    - Pass the requested in-app placements. When placements are omitted, request the six main consumer placements.
-8. Position the source image when the default crop does not keep the subject well framed:
+9. Position the source image when the default crop does not keep the subject well framed:
    - Use global scale and shifts only when the same adjustment works for the complete pack.
    - Prefer per-output image overrides when different aspect ratios need different crops. Target performance overrides by text-set index and size; target in-app overrides by placement.
    - Use scale percentages and 50-pixel shift increments. Positive X moves the image right; positive Y moves it down.
    - Re-render with the same source image after a positioning adjustment. Do not generate a replacement source merely to fix a crop.
-9. Wait for the same render request to finish. Do not start duplicate work merely because adaptive crops or uncrops take longer.
-10. Verify that the result reports `status: ready` and contains at least one asset URL. When practical, confirm that the ZIP contains the expected number of files and inspect one square and one vertical result. If a subject is clipped or poorly balanced, adjust only the affected outputs and verify them again.
-11. Report the result with:
+10. Wait for the same render request to finish. Do not start duplicate work merely because adaptive crops or uncrops take longer.
+11. Verify that the result reports `status: ready` and contains at least one asset URL. When practical, confirm that the ZIP contains the expected number of files and inspect one square and one vertical result. If a subject is clipped or poorly balanced, adjust only the affected outputs and verify them again.
+12. Report the result with:
    - A concise completion summary.
    - Every asset grouped by copy variation and size or placement.
    - The ZIP URL, when returned.
@@ -52,6 +53,7 @@ Turn a brief or source image into a complete banner matrix. Return the rendered 
 ## Reliability and Safety
 
 - Do not claim success before the selected renderer returns a ready result and real asset URLs.
+- Treat uploading as non-destructive but state-changing: upload only an image the user supplied or explicitly approved.
 - Never fabricate or reconstruct asset, archive, source-image, or edit URLs.
 - Do not expose credentials, authorization headers, internal errors, or local configuration.
 - Do not retry paid image generation after an ambiguous timeout without explicit user approval. The first request may still be running.
