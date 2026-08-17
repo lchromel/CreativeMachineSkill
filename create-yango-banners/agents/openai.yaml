@@ -1,0 +1,13 @@
+interface:
+  display_name: "Create Yango Banners"
+  short_description: "Generate editable Yango banner packs"
+  default_prompt: "Use $create-yango-banners to create a ready-to-edit Yango performance or in-app banner pack."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "yango-creative-machine"
+      description: "Generate source visuals and render editable Yango banner packs"
+      transport: "streamable_http"
+      url: "https://creativemachiemcp-production.up.railway.app/mcp"
+policy:
+  allow_implicit_invocation: true
