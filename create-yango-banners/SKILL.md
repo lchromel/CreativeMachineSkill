@@ -1,6 +1,6 @@
 ---
 name: create-yango-banners
-description: Generate, edit, revise, and render finished Yango-family creative assets through Yango Creative Machine. Use for Ride-hailing, Rides for Business, Yango Drive, Yango Motors, or RIDA source images; Photo, Drivers, Yandex Pro or YANGO PRO illustrations, 3D, Lucky, Reference Scene, or Edit workflows; rebuilding flattened banners; revising existing builder links field-by-field; performance and in-app/CRM banner packs; ZIP archives; and editable builder links.
+description: Generate, edit, revise, render, and share finished Yango-family creative assets through Yango Creative Machine. Use for Ride-hailing, Rides for Business, Yango Drive, Yango Motors, or RIDA source images; Photo, Drivers, Yandex Pro or YANGO PRO illustrations, 3D, Lucky, Reference Scene, or Edit workflows; rebuilding flattened banners; revising existing builder links field-by-field; performance and in-app/CRM banner packs; ZIP archives; editable builder links; and publishing finished packs to Yandex Disk.
 ---
 
 # Create Yango Creatives
@@ -49,10 +49,19 @@ Choose the exact image-generation or edit mode, preserve editable states, verify
 7. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
 8. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
 
+## Share to Yandex Disk
+
+1. Call `share_banner_pack_to_yandex_disk` only when the user explicitly asks to share, publish, or upload the finished pack to Yandex Disk. Never publish automatically after rendering.
+2. Pass the real asset URLs returned by the render or revision tool. For performance assets, group each variant under `set_N`; for CRM assets, group each source under `image_N`. Use descriptive file names based on size or placement when available.
+3. Set `category` to `perf` for performance banners and `crm` for in-app assets. The generator creates and uploads the ZIP automatically; do not upload the render tool's ZIP as another asset.
+4. Return `public_url` as the primary share link and also report `folder_name`, `disk_path`, and `uploaded_files` when present.
+5. Keep `YANDEX_DISK_OAUTH_TOKEN` in the generator service only. Do not request, copy, or expose it through MCP or the skill.
+
 ## Reliability and safety
 
 - Treat generation and editing as potentially paid operations. Do not retry them after an ambiguous timeout without explicit approval.
 - Treat upload as state-changing: upload only user-supplied or explicitly approved media.
+- Treat Yandex Disk sharing as an external write: call it only after an explicit share/publish/upload request.
 - Retry a transient render or ZIP failure at most once because it reuses the source.
 - Never fabricate, normalize, or reconstruct source, asset, ZIP, or editor URLs.
 - Do not expose credentials, authorization headers, internal traces, or local configuration.
