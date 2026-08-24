@@ -7,6 +7,16 @@ description: Generate, edit, revise, render, and share finished Yango-family cre
 
 Choose the exact image-generation or edit mode, preserve editable states, verify the source, render the requested matrix, and return real asset and editor links.
 
+## Keep audience, source style, and carrier separate
+
+Make three independent decisions before generating or rendering:
+
+1. **Audience** — who receives the communication: consumers/passengers or drivers. Infer this from the intended recipient and message, not merely from who appears in the picture. Phrases such as "для водителей", driver communication, earnings, fleet, or Yango Pro tasks indicate a driver audience. A consumer message may still show a driver; that does not make it driver communication.
+2. **Source workflow** — how the source image is produced: `photo`, `drivers`, `yandex-pro`, `yango-pro-illustrations`, `3d`, `lucky`, `reference-scene`, upload, or Edit. The `drivers` source style creates driver-focused photography; it is not a CRM carrier and does not replace the audience decision. Driver communication may use any suitable source workflow, not only `drivers`.
+3. **Carrier** — where the finished creative will be used. For CRM/in-app, the audience selects the placement family: consumer audience uses ordinary placements and driver audience uses `drivers-*`. Performance sizes are a separate carrier family and do not use CRM placement names.
+
+Resolve the audience before interpreting a generic carrier name. Thus "feed для водителей" means `drivers-feed`, while a passenger-facing feed means `feed`. If the intended recipient is genuinely unclear and choosing the wrong family would produce unusable assets, ask one short audience question before rendering.
+
 ## Route existing banner revisions first
 
 1. Check whether the user supplied an `edit_url` before treating a banner as an image.
@@ -21,7 +31,7 @@ Choose the exact image-generation or edit mode, preserve editable states, verify
 2. For an attached/local JPEG, PNG, or WebP up to 20 MB, encode it as a Base64 data URL and call `upload_source_image`. Never pass a local path as a remote source URL.
 3. Call `generate_source_image` for generation, using this routing:
    - `photo`: Require country, vehicle model, and tariff/transport label. Use for ordinary Ride-hailing or Rides for Business photography.
-   - `drivers`: Require country, vehicle model, tariff, and a driver-focused brief. Use only with Ride-hailing.
+   - `drivers`: Require country, vehicle model, tariff, and a driver-focused visual brief. Use only with Ride-hailing. This selects the source-image style, not the CRM placement family.
    - `yandex-pro`: Require a scene brief and at least one Yandex Pro scene ingredient. Use an approved background color.
    - `yango-pro-illustrations`: Require a scene brief and exactly one scene focus. Optionally select its exact reference and skin-tone palette.
    - `3d`: Require only the object or scene brief.
@@ -43,13 +53,16 @@ Choose the exact image-generation or edit mode, preserve editable states, verify
    - Use `render_banner_pack` for paid-social/performance formats.
    - Use `render_in_app_pack` for CRM, showcase, fullscreen, feed, promo, ticket, or WhatsApp placements.
 3. Convert each performance copy variation into a separate text set. Default to all four performance sizes when none are specified.
-4. For in-app work, pass requested placements; default to the six main consumer placements. Use a left-side icon when badge text is empty and a badge only when it contains text.
-5. Keep positioning at 100% and zero shift unless inspection shows a problem. Use one global adjustment only when it works for the entire pack; otherwise use per-output overrides. Positive X moves right, positive Y moves down, and shifts use 50-pixel increments.
-6. For a performance badge, set `badge_shift_x`, `badge_shift_y`, and `badge_scale_percent` on its text set. Shifts are relative values from 0 to 100 in steps of 5; scale is 70–150% in steps of 5. Use `badge_overrides` when a specific text-set/size output needs different values.
-7. When revising a performance `edit_url`, use the same badge fields in `performance_text_updates` for the text-set default and `performance_badge_overrides` for individual sizes. Preserve all unspecified badge overrides.
-8. Re-render with the same source after image or badge-position changes. Do not generate another paid source merely to fix positioning.
-9. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
-10. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
+4. Determine the audience before choosing CRM placements:
+   - Consumer communication uses `showcase-main`, `showcase-medium`, `showcase-small`, `fullscreen`, `promo-card`, `feed`, `whatsapp`, `promo-banner`, or `ticket`. Only consumer work may use the six-placement default.
+   - Driver communication must use `drivers-*` placements. Never substitute consumer formats even when the user says only "feed", "stories", "WhatsApp", or another generic carrier name. Map these to `drivers-feed`, `drivers-stories`, `drivers-whatsapp`, and the corresponding driver carrier. The available driver set is `drivers-fleet-room-preview`, `drivers-stories-showcase`, `drivers-stories`, `drivers-full-screen`, `drivers-feed`, `drivers-fleet-room-story`, `drivers-whatsapp`, `drivers-tg-chats`, `drivers-tg-post`, `drivers-tg-stories`, and `drivers-mail`.
+5. Use a left-side icon when badge text is empty and a badge only when it contains text.
+6. Keep positioning at 100% and zero shift unless inspection shows a problem. Use one global adjustment only when it works for the entire pack; otherwise use per-output overrides. Positive X moves right, positive Y moves down, and shifts use 50-pixel increments.
+7. For a performance badge, set `badge_shift_x`, `badge_shift_y`, and `badge_scale_percent` on its text set. Shifts are relative values from 0 to 100 in steps of 5; scale is 70–150% in steps of 5. Use `badge_overrides` when a specific text-set/size output needs different values.
+8. When revising a performance `edit_url`, use the same badge fields in `performance_text_updates` for the text-set default and `performance_badge_overrides` for individual sizes. Preserve all unspecified badge overrides.
+9. Re-render with the same source after image or badge-position changes. Do not generate another paid source merely to fix positioning.
+10. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
+11. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
 
 ## Share to Yandex Disk
 
