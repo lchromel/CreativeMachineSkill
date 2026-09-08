@@ -1,83 +1,68 @@
 ---
 name: create-yango-banners
-description: Generate, edit, revise, render, and share finished Yango-family creative assets through Yango Creative Machine. Use for Ride-hailing, Rides for Business, Yango Drive, Yango Motors, or RIDA source images; Photo, Drivers, Yandex Pro or YANGO PRO illustrations, 3D, Lucky, Reference Scene, or Edit workflows; rebuilding flattened banners; revising existing builder links field-by-field; performance and in-app/CRM banner packs; ZIP archives; editable builder links; and publishing finished packs to Yandex Disk.
+description: Create and revise Yango Creative Machine images, performance and CRM banners, automotive and UGC videos, and creative experiments. Use for Yango-family services including Garage and scooters, image glitch repair, editable builder links, media libraries, archives, and requested Yandex Disk sharing through the Creative Machine MCP.
 ---
 
 # Create Yango Creatives
 
-Choose the exact image-generation or edit mode, preserve editable states, verify the source, render the requested matrix, and return real asset and editor links.
+Use the Creative Machine MCP for the user's requested image, banner or video workflow. Return actual outputs and preserve editable settings. Reply in the user's language.
 
-## Keep audience, source style, and carrier separate
+## Discover and route
 
-Make three independent decisions before generating or rendering:
+- `get_banner_capabilities` lists image services, styles, brands, placements, sizes and positioning limits.
+- `get_source_catalog` reads current `vehicles`, `garage`, or `glitch-repairs` options from the generator. Use the catalogue for exact country/city/car combinations, tariffs and repair IDs.
+- `get_operation_contract()` lists advanced tools. Call it with `tool_name` before an unfamiliar operation to see its native request fields and defaults. Advanced tools take a `payload` object with the upstream field names, commonly camelCase; convenience tools take snake_case arguments.
+- For source generation, Garage, scooters, countryside scenes, glitch repair or experiments, read [image workflows](references/image-workflows.md).
+- For Standard/UGC video, storyboards, reference uploads and branded exports, read [video workflows](references/video-workflows.md).
+- For multiple source images, detailed performance/CRM options, native render matrices, library operations or builder state serialization, read [advanced API](references/advanced-api.md).
 
-1. **Audience** — who receives the communication: consumers/passengers or drivers. Infer this from the intended recipient and message, not merely from who appears in the picture. Phrases such as "для водителей", driver communication, earnings, fleet, or Yango Pro tasks indicate a driver audience. A consumer message may still show a driver; that does not make it driver communication.
-2. **Source workflow** — how the source image is produced: `photo`, `drivers`, `yandex-pro`, `yango-pro-illustrations`, `3d`, `lucky`, `reference-scene`, upload, or Edit. The `drivers` source style creates driver-focused photography; it is not a CRM carrier and does not replace the audience decision. Driver communication may use any suitable source workflow, not only `drivers`.
-3. **Carrier** — where the finished creative will be used. For CRM/in-app, the audience selects the placement family: consumer audience uses ordinary placements and driver audience uses `drivers-*`. Performance sizes are a separate carrier family and do not use CRM placement names.
+## Handle queued operations
 
-Resolve the audience before interpreting a generic carrier name. Thus "feed для водителей" means `drivers-feed`, while a passenger-facing feed means `feed`. If the intended recipient is genuinely unclear and choosing the wrong family would produce unusable assets, ask one short audience question before rendering.
+Convenience image/render tools wait for their results. Advanced generation, editing, rendering, archives and sharing usually return `operation_id`, `operation_client_id` and `status: queued` or `running`.
 
-## Route existing banner revisions first
+1. Retain both IDs. Call `wait_for_operation` with them and a timeout up to 60 seconds. Continue checking the same task while it runs; report useful progress during long work.
+2. On `succeeded`, use the nested `result` as the operation response. Queued or running is not a finished asset.
+3. On `failed` or `interrupted`, inspect `error` and `can_resume`. When `can_resume` is true and continuation is authorized, call `resume_operation` with `payload.operationId` and the original `operation_client_id`. This continues the known video task.
+4. After an ambiguous submission timeout, use `list_operation_jobs` with the owner ID reported in the error. After a status timeout, retry only the status read. Never create a new paid generation merely because the connection was lost.
+5. Caller-supplied `request_id` requires the original `operation_client_id`; an authorized submission retry must retain both IDs and the exact payload. Do not repurpose the key for changed inputs.
+6. Older video/storyboard APIs can return a separate `job_id`; follow it with `get_video_generation_job` or `get_video_storyboard_job` using `parameters.jobId`.
 
-1. Check whether the user supplied an `edit_url` before treating a banner as an image.
-2. When an `edit_url` exists, call `revise_banner_from_edit_link`. Patch only the requested text, brand, layout, badge, source, placement, or positioning fields. Keep omitted fields unchanged, render the saved `perf` or `crm` section, and return the newly created `edit_url`. Do not upload a screenshot, run OCR, or use image Edit merely to change editable fields.
-3. When no `edit_url` exists and the supplied PNG/JPEG/WebP is a flattened banner with image, text, logo, or disclaimer baked into one raster, route it through `edit_source_image` (Creative Machine Edit mode).
-4. For a flattened banner whose copy or logo must become editable, first use `edit_source_image` to remove the baked text/logo/disclaimer and reconstruct the background. Then pass the cleaned source to `render_banner_pack` or `render_in_app_pack` with the new fields. Do not place fresh editable copy on top of old baked copy.
-5. For a purely visual pixel change to a flattened banner, return the Edit result directly unless the user also requests a reusable editable pack.
+## Keep audience, source style and carrier separate
 
-## Route the source workflow
+Choose the intended recipient before rendering. Driver communication includes earnings, fleet and Yango Pro tasks; showing a driver in a passenger advertisement does not make the audience drivers. The `drivers` image style controls photography only.
 
-1. Use an existing public/Yango-hosted source-image URL unchanged when the user supplies one. Apply the existing-banner rules above when the URL points to a finished banner.
-2. For an attached/local JPEG, PNG, or WebP up to 20 MB, encode it as a Base64 data URL and call `upload_source_image`. Never pass a local path as a remote source URL.
-3. Call `generate_source_image` for generation, using this routing:
-   - `photo`: Require country, vehicle model, and tariff/transport label. Use for ordinary Ride-hailing or Rides for Business photography.
-   - `drivers`: Require country, vehicle model, tariff, and a driver-focused visual brief. Use only with Ride-hailing. This selects the source-image style, not the CRM placement family.
-   - `yandex-pro`: Require a scene brief and at least one Yandex Pro scene ingredient. Use an approved background color.
-   - `yango-pro-illustrations`: Require a scene brief and exactly one scene focus. Optionally select its exact reference and skin-tone palette.
-   - `3d`: Require only the object or scene brief.
-   - `lucky`: Require country, vehicle model, tariff, and the campaign idea. Default to four variants and one or more Lucky styles; use split and feedback only when requested or iterating.
-   - `reference-scene`: Upload references first, preserve their returned order, and describe them as Image 1, Image 2, and so on in the scenario.
-4. Use service-specific Photo generation for:
-   - `rides-for-business`: country, business vehicle/tariff, and B2B brief.
-   - `yango-drive`: country, city, vehicle model, optional color, angles, and variant count.
-   - `yango-motors`: vehicle model, optional angle, weather, and location wish.
-   - `rida`: one or more RIDA items, each containing a brief, role (`user`, `driver`, or `none`), and transport (`car`, `moto`, or `none`).
-5. Call `edit_source_image` for Edit mode. Supply the source URL, precise edit instruction, optional reference URL, and desired ratio. Reuse the returned URL for further edits or rendering. Never use this tool for field-only changes when an `edit_url` exists.
-6. Call `regenerate_source_image` only when rerunning an already finalized prompt. Do not use it to translate a new campaign brief.
-7. Call `get_banner_capabilities` when a requested service, style, brand, size, placement, or option may be unsupported. Treat it as authoritative.
+For CRM, consumer communication uses ordinary placements; driver communication uses `drivers-*`. Map a generic driver request for feed, stories or WhatsApp to `drivers-feed`, `drivers-stories` or `drivers-whatsapp`. Ask about the audience only when it cannot be inferred and the wrong placement family would make the output unusable.
+
+## Revise existing assets
+
+- With an `edit_url`, use `revise_banner_from_edit_link` for requested field changes. Omitted fields stay unchanged and the tool returns a new editable link. Use `performance_text_updates` or `in_app_text_updates` for the saved section.
+- Without an editor link, a flattened banner goes through `edit_source_image`. If its copy must become editable, remove baked text/logo/disclaimer and reconstruct the background, then rebuild with a renderer.
+- For a purely visual pixel change, return the edited image unless a reusable pack is also requested.
+- For unsupported convenience fields, load the full saved state with `get_builder_settings`, preserve untouched fields and follow the native matrix workflow in the advanced reference. Do not silently discard new fields.
 
 ## Verify and render
 
-1. Inspect every generated or edited source when image inspection is available. Check the requested people, identity, vehicle, setting, action, safety details, references, and usable text space.
-2. Choose the renderer:
-   - Use `render_banner_pack` for paid-social/performance formats.
-   - Use `render_in_app_pack` for CRM, showcase, fullscreen, feed, promo, ticket, or WhatsApp placements.
-3. Convert each performance copy variation into a separate text set. Default to all four performance sizes when none are specified.
-4. Determine the audience before choosing CRM placements:
-   - Consumer communication uses `showcase-main`, `showcase-medium`, `showcase-small`, `fullscreen`, `promo-card`, `feed`, `whatsapp`, `promo-banner`, or `ticket`. Only consumer work may use the six-placement default.
-   - Driver communication must use `drivers-*` placements. Never substitute consumer formats even when the user says only "feed", "stories", "WhatsApp", or another generic carrier name. Map these to `drivers-feed`, `drivers-stories`, `drivers-whatsapp`, and the corresponding driver carrier. The available driver set is `drivers-fleet-room-preview`, `drivers-stories-showcase`, `drivers-stories`, `drivers-full-screen`, `drivers-feed`, `drivers-fleet-room-story`, `drivers-whatsapp`, `drivers-tg-chats`, `drivers-tg-post`, `drivers-tg-stories`, and `drivers-mail`.
-5. Use a left-side icon when badge text is empty and a badge only when it contains text.
-6. Keep positioning at 100% and zero shift unless inspection shows a problem. Use one global adjustment only when it works for the entire pack; otherwise use per-output overrides. Positive X moves right, positive Y moves down, and shifts use 50-pixel increments.
-7. For a performance badge, set `badge_shift_x`, `badge_shift_y`, and `badge_scale_percent` on its text set. Shifts are relative values from 0 to 100 in steps of 5; scale is 70–150% in steps of 5. Use `badge_overrides` when a specific text-set/size output needs different values.
-8. When revising a performance `edit_url`, use the same badge fields in `performance_text_updates` for the text-set default and `performance_badge_overrides` for individual sizes. Preserve all unspecified badge overrides.
-9. Re-render with the same source after image or badge-position changes. Do not generate another paid source merely to fix positioning.
-10. Verify `status: ready`, asset count, representative square and vertical outputs, and ZIP contents when practical.
-11. Return every asset grouped by variant and size/placement, the ZIP URL, the `edit_url`, and all warnings.
+1. Reuse a provided public/Yango source URL unchanged. For local/attached JPEG, PNG or WebP up to 20 MB, call `upload_source_image` with Base64 data; local paths are not remote URLs.
+2. Inspect generated/edited sources when image inspection is available: requested subject and vehicle, identity, setting, action, references and usable text space.
+3. Use `render_banner_pack` for performance. Each copy variation is a text set; default to the four performance sizes when unspecified.
+4. Use `render_in_app_pack` for CRM. Its omitted placements default only to consumers. Driver placements are `drivers-fleet-room-preview`, `drivers-stories-showcase`, `drivers-stories`, `drivers-full-screen`, `drivers-feed`, `drivers-fleet-room-story`, `drivers-whatsapp`, `drivers-tg-chats`, `drivers-tg-post`, `drivers-tg-stories`, and `drivers-mail`.
+5. For Yandex Go B2B, use brand `yandex-go-b2b`, layout `frame`, a locale from capabilities, and the desired `text_sets[].accent_color`. One editable pack uses one palette; use separate packs for different colors.
+6. Use a left-side icon when CRM badge text is empty; a labeled badge requires text. A CRM price badge is separate from the service badge.
+7. Start image positioning at 100% and zero shift. Positive X moves right; positive Y moves down; shifts use 50-pixel increments. Use per-output overrides when one global crop cannot fit the pack.
+8. Performance badge shifts are 0–100 in steps of 5; scale is 70–150% in steps of 5. Set defaults on the text set and individual-size values through `badge_overrides`. Revisions use `performance_badge_overrides`. `badge_small_text_position` chooses top/bottom; CRM revisions expose independent `price_badge_*` fields.
+9. Re-render the same source after positioning changes; avoid another paid generation solely for crop adjustments.
+10. Verify successful status, asset count, representative square/vertical outputs and archive contents when practical. Return all requested asset URLs grouped by variant/size/placement, ZIP, editable link and warnings.
 
-## Share to Yandex Disk
+## Deliver and manage media
 
-1. Call `share_banner_pack_to_yandex_disk` only when the user explicitly asks to share, publish, or upload the finished pack to Yandex Disk. Never publish automatically after rendering.
-2. Pass the real asset URLs returned by the render or revision tool. For performance assets, group each variant under `set_N`; for CRM assets, group each source under `image_N`. Use descriptive file names based on size or placement when available.
-3. Set `category` to `perf` for performance banners and `crm` for in-app assets. The generator creates and uploads the ZIP automatically; do not upload the render tool's ZIP as another asset.
-4. Return `public_url` as the primary share link and also report `folder_name`, `disk_path`, and `uploaded_files` when present.
-5. Keep `YANDEX_DISK_OAUTH_TOKEN` in the generator service only. Do not request, copy, or expose it through MCP or the skill.
+Publish only when the user asks to share/upload/publish to Yandex Disk. Use `share_banner_pack_to_yandex_disk` for performance/CRM assets or `share_videos_to_yandex_disk` for videos. Pass real rendered URLs; the generator creates the package ZIP. Do not upload a ZIP as another banner. Use category `perf` or `crm`, group performance variants under `set_N` and CRM images under `image_N`, and return `public_url` as the primary share link.
 
-## Reliability and safety
+Use paginated library reads to reuse existing assets. Delete library entries only when requested. A download counter update is not an actual media download.
 
-- Treat generation and editing as potentially paid operations. Do not retry them after an ambiguous timeout without explicit approval.
-- Treat upload as state-changing: upload only user-supplied or explicitly approved media.
-- Treat Yandex Disk sharing as an external write: call it only after an explicit share/publish/upload request.
-- Retry a transient render or ZIP failure at most once because it reuses the source.
-- Never fabricate, normalize, or reconstruct source, asset, ZIP, or editor URLs.
-- Do not expose credentials, authorization headers, internal traces, or local configuration.
-- If authentication fails, distinguish MCP access from upstream Yango access without revealing secrets.
+## Reliability
+
+Generation, vision audits, prompt generation and editing may incur provider charges. Do not repeat ambiguous paid operations without authorization. A definite transient render/archive failure may be retried once with the same sources; queued/running tasks must instead be checked by ID.
+
+Upload only user-provided or authorized media. Keep provider credentials and Yandex Disk OAuth in the generator; MCP video submission uses a server-side `YANGO_VIDEO_GENERATION_PASSWORD`. If local credentials are needed, use the user's designated token file first without printing secrets. Distinguish missing MCP access, upstream authentication and video-password configuration failures.
+
+Never fabricate asset links, expose authorization headers/internal traces, or claim a task is complete without its returned output. When rewriting a prompt, provide the complete revised prompt.
