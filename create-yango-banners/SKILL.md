@@ -37,6 +37,16 @@ Local work includes connection setup (creating the personal token file, reading 
 
 An explicit request to use a different production tool is outside this skill's workflow; explain the switch before following that request. A generic request for a banner, speed, or a retry does not authorize a fallback.
 
+## Preserve the requested brand and logo
+
+Use the user's named brand explicitly in every render and saved editor state. “Yango” / “Янго” means `brand="yango"`; “Yandex Go” / “Яндекс Go” means `brand="yandex-go"`. The city, language of the request, copy language and vehicle catalogue do not change the brand. Reuse a source independently of its previous banner branding. A reference or saved template from another brand does not override the current brief.
+
+For Yango performance use `logo_variant="default"` (`logoVariant="default"` in native payloads and saved settings). Yango also supports `icon` and `none` when requested. The upstream renderer can select a Yandex Go logo for language variants such as `en` or `ar` even while `brand="yango"`; MCP rejects this combination. Logo variant is not the language of the banner copy. Keep copy language in the text settings. If this validation fails, correct the logo field and render the same source; do not switch brands to bypass it.
+
+Example brief: «создай баннер для yango в Абу Даби с оффером про скидки 30% на 3 первые поездки». Resolve Yango, Abu Dhabi/UAE, and the complete offer “30% на первые 3 поездки”; pass `brand="yango"`, `logo_variant="default"`, and preserve both the percentage and trip count in the approved copy. Ask only unresolved word, badge and layout choices. No brand question is needed here.
+
+For revisions preserve the existing brand unless the user names a replacement or reports a wrong logo. When repairing Yandex Go to Yango, set both `brand="yango"` and `logo_variant="default"` in performance so an old logo locale cannot survive the brand change. CRM uses its own brand and badge controls. Inspect the rendered logo against the requested brand when image inspection is available; an incorrect logo is not a finished result. Repair renderer branding with the same source and return the corrected asset and editor links.
+
 ## Choose words, badge text and layout
 
 Keep creative questions concrete. For a new banner, offer layout choices and ask only which exact words to emphasize and what text belongs in the badge. Use the supplied copy in the questions, not an abstract interview about priority, emotion, strategy or the hero. Combine unresolved choices in one short message, in the user's language:
