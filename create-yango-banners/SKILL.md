@@ -29,6 +29,34 @@ Local work includes connection setup (creating the personal token file, reading 
 
 An explicit request to use a different production tool is outside this skill's workflow; explain the switch before following that request. A generic request for a banner, speed, or a retry does not authorize a fallback.
 
+## Clarify the creative priority before generation
+
+For a new creative or a substantial redesign, identify what the viewer should notice first, what action the creative supports, and which supplied words/visuals must stay exact. Use the brief, references, saved builder state and answers already given. When these imply one clear hierarchy, state that interpretation briefly and proceed. For a precise revision such as “move the badge under the text”, make the requested change without reopening the brief.
+
+If two plausible interpretations would produce materially different creatives, ask one to three short questions together before the affected generation/render. Start with the unresolved priority, then ask how to express it only if needed. Speak in the user's language and familiar design terms; do not ask users to choose API field names, percentages of slider travel, or internal modes. Offer two or three meaningful options when helpful, with a recommendation tailored to the brief and room for a free-text answer. Examples to adapt, not a mandatory questionnaire:
+
+| Missing decision | Example question in Russian |
+| --- | --- |
+| Main visual priority | «Что человек должен заметить первым: скидку, основное сообщение или героя/машину?» |
+| How to emphasize the offer | «Как выделим скидку: крупным заголовком, целиком в ярком бейдже или оставим её второстепенной?» |
+| Copy hierarchy | «Что делаем крупным, а что пояснением? Есть ли текст, который нужно сохранить дословно?» |
+| Ambiguous split of an offer | «В бейдже выделим “15% OFF” целиком или сделаем акцент на “15%”, а “OFF” — мелким? Я бы оставил оффер целиком». |
+| Audience or placement affects the layout | «Это для пассажиров или водителей, и где будет размещаться баннер?» |
+| Visual treatment is unspecified | «Какое впечатление нужно: повседневная поездка, премиальная подача или яркая промоакция?» |
+
+Select only unanswered decisions that change the output. Do not ask about a split when the complete-offer default already fits the brief; explicit percentages, conditions and campaign text remain intact. “Make it brighter” on an existing asset does not invite inventing a new offer. Do not infer 3D imagery merely from “яркая промоакция”.
+
+While waiting, inspect available MCP capabilities, catalogues or saved settings when useful. Do not start paid generation or commit a render to the unresolved direction. When the user answers, summarize the resulting hierarchy in one sentence and proceed without another confirmation round. Carry the decision through all requested sizes and future revisions. If the user explicitly delegates the choice (“на твой вкус”, “без вопросов”), choose a suitable supported treatment, state it briefly and proceed; silence alone is not delegation.
+
+Translate the answer into actual renderer settings:
+
+- A complete offer in a badge: use `badge_bottom_text` for the whole primary offer and `badge_top_text=""`. For an explicitly requested numeric emphasis, put the number in the large field and the qualifier in the small field; use `badge_small_text_position` to place the qualifier as requested.
+- An offer as the main message: put that offer in `headline`, with actual supporting conditions in `subtitle` or the appropriate disclaimer field. Avoid repeating it in a badge unless that repetition was requested or clearly part of the supplied layout.
+- A hero/vehicle priority: choose a supported source composition with sufficient copy space and adapt crops per size. Keep branding, required offer conditions and legibility intact.
+- Use the chosen supported brand palette, headline size, badge scale and web-default positioning to express emphasis. Check capabilities before offering a treatment. If the request exceeds the generator's layout controls, explain the concrete limit and propose a supported alternative; keep production in MCP.
+
+Example interpretation after an answer: «Главный акцент — “15% OFF” целиком в крупном бейдже под текстом; “Your city. Your ride.” оставляем заголовком, “Book with Yango” — пояснением, мелкую строку бейджа не заполняем». This is a working summary, not an additional approval gate. Inspect the final render against this hierarchy as well as technical layout checks.
+
 ## Source image is not a finished banner
 
 For a new standard performance/CRM banner, follow the complete chain: select or generate/upload a source through this MCP, render with `render_banner_pack` / `render_in_app_pack` (or their native matrix equivalents), then return the renderer's output URLs and editable link. Keep the headline, subtitle, offer, disclaimer and banner logo in renderer fields. Do not ask a source-image generator to paint the entire advertising layout and present that raster as the finished banner.
