@@ -134,6 +134,16 @@ Verify that the badge follows the copy block and does not overlap the logo or di
 9. Re-render the same source after positioning changes; avoid another paid generation solely for crop adjustments.
 10. Verify successful status, asset count, representative square/vertical outputs and archive contents when practical. Return all requested asset URLs grouped by variant/size/placement, ZIP, editable link and warnings.
 
+## CRM exports: with text and without text together
+
+By default, deliver BOTH variants for every requested CRM image/placement: **with text** and **without text**. This is the normal export, not a choice to ask the user about. `render_in_app_pack` and CRM `revise_banner_from_edit_link` calls now include both when `include_textless` is omitted/true. Each returned banner has `variant: "with_text"` or `"without_text"`; the common ZIP separates them into those two folders. Return both groups of asset links and the combined archive. Set `include_textless=false` only if the user explicitly requests with-text only. For explicitly clean-only output use the native CRM workflow.
+
+The clean variant uses the generator's native `hideTextAndBadges=true`: overlay text, disclaimers and badges are hidden; source imagery, crops, placement sizes and layout treatment are retained. Do not remove text by editing the source image, blank the saved copy, or switch `fade` to `no-fade`. Baked-in text inside a source is not removed by this switch. The editable link preserves the filled text and badge settings; it does not pretend to save a separate clean-mode toggle.
+
+For advanced `render_crm_matrix`, follow the paired rendering steps in [advanced API](references/advanced-api.md). Reuse the same prepared sources and positioning. A queued response, missing clean variant, or mismatched set is not a completed dual export. After a partial failure, inspect returned task IDs and completed outputs; do not restart source generation or repeat an unknown paid submission.
+
+When Disk sharing is explicitly requested, include BOTH groups under distinguishable variant folders (and image groups where relevant). Do not silently upload only the first variant or the ZIP instead of its constituent images.
+
 ## Deliver and manage media
 
 Publish only when the user asks to share/upload/publish to Yandex Disk. Use `share_banner_pack_to_yandex_disk` for performance/CRM assets or `share_videos_to_yandex_disk` for videos. Pass real rendered URLs; the generator creates the package ZIP. Do not upload a ZIP as another banner. Use category `perf` or `crm`, group performance variants under `set_N` and CRM images under `image_N`, and return `public_url` as the primary share link.

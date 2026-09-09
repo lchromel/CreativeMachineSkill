@@ -28,7 +28,14 @@ Use `render_crm_matrix` for multiple images, multiple copy options per placement
 - `crmImageOverrides` targets `imageIndex`, `placement` and `textOptionIndex`.
 - Retain audience routing: driver communication uses only `drivers-*` carriers. The consumer defaults are not a fallback for drivers.
 
-The queue permits at most 30 placement entries per request. Use `category="crm"` for archives or sharing.
+Default CRM delivery includes both with-text and without-text exports. For native matrices:
+
+1. Submit the normal payload with `hideTextAndBadges=false` and wait for success.
+2. Copy it, set `hideTextAndBadges=true`, and reuse returned prepared `source_image_url` values per image as `imageSets[].bannerSourceUrl`. Keep the same image/placement/text-option combinations and crop overrides; retain layout/fade settings. Submit and wait for success. Do not ask the image model to generate a clean copy.
+3. Check that both results cover the requested images, placements, options and sizes. Group actual URLs as `with_text` and `without_text`; create one ZIP with `{url, folder}` entries for both folders. Save the original text-bearing builder state for the editor link, rather than erasing its copy.
+4. If the user explicitly requests only one variant, render only that variant. The convenience tools perform the paired workflow by default and accept `include_textless=false` for with-text only.
+
+The queue permits at most 30 placement entries per request, in each variant. Use `category="crm"` for archives or sharing. Native clean mode hides text and badges, not source pixels or the layout's fade.
 
 ## Builder serialization
 
