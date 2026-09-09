@@ -57,6 +57,28 @@ The bundled Codex plugin already contains the production URL and the bearer envi
 
 See [Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
 
+### Terminal entry and stale credentials
+
+Use the personal-file workflow by default. If the user is already using terminal entry, diagnose that path instead of assuming they edited a file. Ask for the complete command without the token if it is cropped or unavailable.
+
+First inspect this connection's configured credential name without printing credentials. The current plugin uses `CREATIVE_MACHINE_API_TOKEN`. Align a legacy client setting that still points to `MCP_API_TOKEN` with the current client name before prescribing a command. Leave the server's Railway `MCP_API_TOKEN` setting unchanged. Do not change unrelated MCP connections.
+
+For terminal entry on macOS with the current environment-based client configuration, provide this complete command in a fenced code block, exactly with literal underscores:
+
+```sh
+python3 -c 'import getpass,subprocess; subprocess.run(["launchctl","setenv","CREATIVE_MACHINE_API_TOKEN",getpass.getpass("Token: ")],check=True)'
+```
+
+Explain that the user types the raw token into the hidden prompt, then fully quits Codex with Command-Q and reopens it. This command updates the user launch environment; it does not change the client configuration or update the environment of an already-running process. Do not use it for a client configured with private headers or OAuth. If a credential is already saved in the selected personal file, configure from that file instead of asking for another terminal entry.
+
+When troubleshooting the reported token:
+
+- `getpass` reads the submitted line; this command contains no truncation or nine-character limit. An environment read by the still-running agent may return an old value. Do not describe that value as the token the user just typed.
+- In executable code, `MCP\_API\_TOKEN` contains literal backslashes and names a different variable from `MCP_API_TOKEN`. Never escape underscores inside fenced shell/Python commands. If backslashes appear only in a pasted Markdown representation, establish whether they were actually in the executed command before assigning the cause.
+- Track the sources separately: the user's selected file, the variable saved through `launchctl`, the current process environment, and the client's configured credential source. Inspect only the named credential; capture sensitive command output internally and report source names and match/mismatch or presence, not values. Never run a bare `launchctl getenv` or dump a client config into visible tool output.
+- A reported length such as nine characters is meaningful only for the specific source freshly inspected. Do not infer the user's token length from a placeholder, a cached process environment, or another variable. No fixed token length is specified by this service. Treat a 401/403 as observed only after an actual response, not as a prediction based on length.
+- After a name/source correction and restart, check the actual MCP connection and call `get_banner_capabilities`. If tools are still absent, report that the client has not loaded/reconnected; do not blame the freshly entered token without evidence. If the intended source cannot be inspected from this task, state that limit and give the precise next verification step.
+
 ## Claude Code
 
 Merge the following into the project's `.mcp.json`, preserving existing server entries. Claude Code expands the environment reference in `headers`; the Codex plugin's bearer field is not a substitute for this configuration.
