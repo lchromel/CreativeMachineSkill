@@ -19,6 +19,14 @@ Setup is part of this skill and works before MCP tools load. Missing tools, an u
 
 When repairing token setup, first identify the actual input path: the linked file or a terminal prompt. After a file edit, reread that exact file. After terminal entry, verify the exact variable targeted by the command against this connection's configured credential name; a running agent's old environment does not prove what was just entered. Use `CREATIVE_MACHINE_API_TOKEN` consistently in client configuration and commands, with literal underscores and no Markdown backslashes. Read [terminal entry and stale credentials](references/mcp-setup.md#terminal-entry-and-stale-credentials) before giving a terminal repair command. Report any measured length with its actual source; length alone cannot prove a token is invalid or predict a 401. Keep the file-first setup above as the default; do not ask the user to re-enter a token already saved in their selected source.
 
+## Check for a skill update
+
+Once per task, read this skill's [release.json](release.json) and pass its integer `revision` as `skill_revision` to the mandatory `get_banner_capabilities` call. The MCP returns `skill_update`. If `update_available` is true, say once: «Есть обновление скилла Yango Creative Machine. Пора обновить установленный скилл: [SkillStore](https://skillstore.yandex-team.ru/skills/create-yango-banners) или [GitHub](https://github.com/lchromel/CreativeMachineSkill). После обновления открой новую задачу». Keep the user's current task moving when its required tools remain compatible; do not make the notice an approval gate or silently install anything.
+
+If the local release file is absent, pass no revision and say that the installed version could not be determined; suggest updating without falsely claiming a comparison succeeded. If the server is older than the local skill, or the revisions match, do not prompt for an update. If an older server rejects the optional argument, retry this read-only capability call without it and report the check unavailable. Do not make update checks into paid generations, background monitoring, or repeated reminders within one task. Existing authenticated-connection requirements remain in force.
+
+This is an update notice when the skill is used, not an automatic background notification. SkillStore may still be checking a new upload when its GitHub release and MCP revision are available; do not claim that the store has approved it without checking. Old copies without this check need a one-time update to receive the mechanism.
+
 ## MCP-only media execution
 
 All creative work requires the authenticated MCP connection. While credentials or client support are missing, complete the setup steps available locally, return the token-file link or precise remaining setup action, and wait. Do not turn a connection failure into a replacement creative.
@@ -29,33 +37,24 @@ Local work includes connection setup (creating the personal token file, reading 
 
 An explicit request to use a different production tool is outside this skill's workflow; explain the switch before following that request. A generic request for a banner, speed, or a retry does not authorize a fallback.
 
-## Clarify the creative priority before generation
+## Choose words, badge text and layout
 
-For a new creative or a substantial redesign, identify what the viewer should notice first, what action the creative supports, and which supplied words/visuals must stay exact. Use the brief, references, saved builder state and answers already given. When these imply one clear hierarchy, state that interpretation briefly and proceed. For a precise revision such as “move the badge under the text”, make the requested change without reopening the brief.
+Keep creative questions concrete. For a new banner, offer layout choices and ask only which exact words to emphasize and what text belongs in the badge. Use the supplied copy in the questions, not an abstract interview about priority, emotion, strategy or the hero. Combine unresolved choices in one short message, in the user's language:
 
-If two plausible interpretations would produce materially different creatives, ask one to three short questions together before the affected generation/render. Start with the unresolved priority, then ask how to express it only if needed. Speak in the user's language and familiar design terms; do not ask users to choose API field names, percentages of slider travel, or internal modes. Offer two or three meaningful options when helpful, with a recommendation tailored to the brief and room for a free-text answer. Examples to adapt, not a mandatory questionnaire:
+- «Какие слова выделить — “20%”, “первые 3 поездки” или оставить без выделения? Цветом или плашкой?» Use actual fragments of their copy; do not invent campaign conditions.
+- «Что поставить в бейдж: “20% скидка” целиком, другой текст или без бейджа?» A word highlight and a separate badge are different controls.
+- «Какой лейаут выбрать: Photo, Black, White или Frame? Для Yango у Frame есть серый, красный и чёрный варианты». Adapt this menu to the selected brand and MCP capabilities. Start with two or three suitable alternatives and one short recommendation; show more available layouts if requested. Do not pick one silently when the new brief leaves layout open.
 
-| Missing decision | Example question in Russian |
-| --- | --- |
-| Main visual priority | «Что человек должен заметить первым: скидку, основное сообщение или героя/машину?» |
-| How to emphasize the offer | «Как выделим скидку: крупным заголовком, целиком в ярком бейдже или оставим её второстепенной?» |
-| Copy hierarchy | «Что делаем крупным, а что пояснением? Есть ли текст, который нужно сохранить дословно?» |
-| Ambiguous split of an offer | «В бейдже выделим “15% OFF” целиком или сделаем акцент на “15%”, а “OFF” — мелким? Я бы оставил оффер целиком». |
-| Audience or placement affects the layout | «Это для пассажиров или водителей, и где будет размещаться баннер?» |
-| Visual treatment is unspecified | «Какое впечатление нужно: повседневная поездка, премиальная подача или яркая промоакция?» |
+Skip answered choices, preserve precise revision requests, and accept “на твой вкус” without another round. If copy is absent, settle that first so the word/badge questions have concrete text. Wait for unresolved choices before the affected generation/render, then proceed without requesting the same approval again. Do not generate multiple paid sources merely to offer layout choices. If previews are requested, reuse one source and render the requested layouts through MCP.
 
-Select only unanswered decisions that change the output. Do not ask about a split when the complete-offer default already fits the brief; explicit percentages, conditions and campaign text remain intact. “Make it brighter” on an existing asset does not invite inventing a new offer. Do not infer 3D imagery merely from “яркая промоакция”.
+Translate the choices into supported controls:
 
-While waiting, inspect available MCP capabilities, catalogues or saved settings when useful. Do not start paid generation or commit a render to the unresolved direction. When the user answers, summarize the resulting hierarchy in one sentence and proceed without another confirmation round. Carry the decision through all requested sizes and future revisions. If the user explicitly delegates the choice (“на твой вкус”, “без вопросов”), choose a suitable supported treatment, state it briefly and proceed; silence alone is not delegation.
+- Wrap only selected words with the generator's inline markers in the text fields: `**words**` for accent color, `==words==` for a small inline plaque. Preserve the rest of the sentence. These are generator markers, not Markdown bold; an inline plaque is not the standalone offer badge. Other supported markers are `//words//` for italic and `~~words~~` for strike, when requested. Do not promise arbitrary per-word font sizes. Preserve marker pairs in API payloads and saved editor text.
+- For a separate badge, put the complete chosen offer into the LARGE `badge_bottom_text`; leave `badge_top_text=""` unless the user supplies a small qualifier. For no badge set `badge_enabled=false`. Keep the user's wording and language.
+- Performance layout IDs are `photo`, `black`, `white`, `frame`, `frame-red`, `frame-black`, `frame-white`, but the applicable variants and frame color depend on brand. Yango frame choices are Grey=`frame`, Red=`frame-red`, Black=`frame-black`; Yandex Go uses Yellow=`frame`, Black=`frame-black`, White=`frame-white`; Fasten's `frame-red` is named Blue. RIDA uses White. B2B frame color follows its supported accent palette. Do not describe every brand's `frame` as grey or `frame-red` as red.
+- CRM has a different menu: `fade` (with fade), `no-fade` (without fade), `black-text` (black text). Offer only controls supported by the selected workflow.
 
-Translate the answer into actual renderer settings:
-
-- A complete offer in a badge: use `badge_bottom_text` for the whole primary offer and `badge_top_text=""`. For an explicitly requested numeric emphasis, put the number in the large field and the qualifier in the small field; use `badge_small_text_position` to place the qualifier as requested.
-- An offer as the main message: put that offer in `headline`, with actual supporting conditions in `subtitle` or the appropriate disclaimer field. Avoid repeating it in a badge unless that repetition was requested or clearly part of the supplied layout.
-- A hero/vehicle priority: choose a supported source composition with sufficient copy space and adapt crops per size. Keep branding, required offer conditions and legibility intact.
-- Use the chosen supported brand palette, headline size, badge scale and web-default positioning to express emphasis. Check capabilities before offering a treatment. If the request exceeds the generator's layout controls, explain the concrete limit and propose a supported alternative; keep production in MCP.
-
-Example interpretation after an answer: «Главный акцент — “15% OFF” целиком в крупном бейдже под текстом; “Your city. Your ride.” оставляем заголовком, “Book with Yango” — пояснением, мелкую строку бейджа не заполняем». This is a working summary, not an additional approval gate. Inspect the final render against this hierarchy as well as technical layout checks.
+Example after a choice: «Выделяю “первые 3 поездки” цветом, в бейдж ставлю “20% скидка” целиком, лейаут — Photo». Inspect the resulting words, badge and layout against these exact choices.
 
 ## Source image is not a finished banner
 

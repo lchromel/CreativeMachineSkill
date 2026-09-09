@@ -1,7 +1,7 @@
 interface:
   display_name: "Yango Creative Machine"
   short_description: "Create Yango creatives exclusively through MCP"
-  default_prompt: "Use $create-yango-banners to clarify missing creative priorities and create through MCP; if the token is missing, create a personal token file and give its link before waiting."
+  default_prompt: "Use $create-yango-banners to choose words to highlight, badge text and a layout and create through MCP; if the token is missing, create a personal token file and give its link before waiting."
 dependencies:
   tools:
     - type: "mcp"
