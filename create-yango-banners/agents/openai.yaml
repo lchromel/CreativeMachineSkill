@@ -1,7 +1,7 @@
 interface:
   display_name: "Yango Creative Machine"
-  short_description: "Create Yango images, banners, and videos"
-  default_prompt: "Use $create-yango-banners to create or revise Yango images, editable banners, or videos through Creative Machine."
+  short_description: "Create Yango creatives exclusively through MCP"
+  default_prompt: "Use $create-yango-banners exclusively through Yango Creative Machine MCP; verify the connection first and stop if unavailable."
 dependencies:
   tools:
     - type: "mcp"
