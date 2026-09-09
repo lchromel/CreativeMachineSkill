@@ -43,7 +43,7 @@ Keep creative questions concrete. For a new banner, offer layout choices and ask
 
 - «Какие слова выделить — “20%”, “первые 3 поездки” или оставить без выделения? Цветом или плашкой?» Use actual fragments of their copy; do not invent campaign conditions.
 - «Что поставить в бейдж: “20% скидка” целиком, другой текст или без бейджа?» A word highlight and a separate badge are different controls.
-- «Какой лейаут выбрать: Photo, Black, White или Frame? Для Yango у Frame есть серый, красный и чёрный варианты». Adapt this menu to the selected brand and MCP capabilities. Start with two or three suitable alternatives and one short recommendation; show more available layouts if requested. Do not pick one silently when the new brief leaves layout open.
+- Offer the layout menu below in everyday visual language. Show the applicable choices before rendering a new banner whose layout is unspecified; naming a default or saying “other layouts are available” is not an offer to choose. Keep one short recommendation optional and leave the choice to the user.
 
 Skip answered choices, preserve precise revision requests, and accept “на твой вкус” without another round. If copy is absent, settle that first so the word/badge questions have concrete text. Wait for unresolved choices before the affected generation/render, then proceed without requesting the same approval again. Do not generate multiple paid sources merely to offer layout choices. If previews are requested, reuse one source and render the requested layouts through MCP.
 
@@ -53,6 +53,25 @@ Translate the choices into supported controls:
 - For a separate badge, put the complete chosen offer into the LARGE `badge_bottom_text`; leave `badge_top_text=""` unless the user supplies a small qualifier. For no badge set `badge_enabled=false`. Keep the user's wording and language.
 - Performance layout IDs are `photo`, `black`, `white`, `frame`, `frame-red`, `frame-black`, `frame-white`, but the applicable variants and frame color depend on brand. Yango frame choices are Grey=`frame`, Red=`frame-red`, Black=`frame-black`; Yandex Go uses Yellow=`frame`, Black=`frame-black`, White=`frame-white`; Fasten's `frame-red` is named Blue. RIDA uses White. B2B frame color follows its supported accent palette. Do not describe every brand's `frame` as grey or `frame-red` as red.
 - CRM has a different menu: `fade` (with fade), `no-fade` (without fade), `black-text` (black text). Offer only controls supported by the selected workflow.
+
+### Layout menu to show before rendering
+
+For Yango performance, ask: «Как оформить баннер: фото на весь баннер, чёрный, белый или фото в рамке — красной, серой, чёрной? Можно выбрать несколько». Keep the red option visible in the initial menu instead of hiding it behind “Frame” or “more options”. Map the response to these renderer layouts:
+
+| User-facing choice | MCP layout |
+| --- | --- |
+| Фото на весь баннер (Photo) | `photo` |
+| Чёрный (Black) | `black` |
+| Белый (White) | `white` |
+| Фото в красной рамке (Frame Red) | `frame-red` |
+| Фото в серой рамке (Frame Grey) | `frame` |
+| Фото в чёрной рамке (Frame Black) | `frame-black` |
+
+For other brands, adapt colors and availability using the brand mapping above and live MCP capabilities. “Красный фон” can mean the red layout or the actual scene background: if the distinction is unresolved, ask «Красная рамка вокруг фото или красный фон в самой сцене?» Frame Red retains a photo area; do not promise a solid-red scene from this layout setting. Photo is still a finished banner with the requested copy; it does not mean a textless export.
+
+For CRM, ask: «Как оформить CRM: фото с затемнением под текст, фото без затемнения или вариант с чёрным текстом? Можно выбрать несколько». Use `fade`, `no-fade`, and `black-text` respectively. Performance's red/grey/black frames are not CRM layouts. If the user asks for a red CRM scene, distinguish the source-image request from these layout controls.
+
+When several layouts are selected, render each through MCP using the same source, copy and sizes; group outputs and editor links by layout. For CRM, deliver both with-text and without-text exports for every selected layout. Selecting several layouts does not require generating several new source images. Preserve an existing layout during revisions unless the user asks to change or compare it.
 
 Example after a choice: «Выделяю “первые 3 поездки” цветом, в бейдж ставлю “20% скидка” целиком, лейаут — Photo». Inspect the resulting words, badge and layout against these exact choices.
 
