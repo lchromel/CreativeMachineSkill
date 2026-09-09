@@ -72,6 +72,28 @@ For CRM, consumer communication uses ordinary placements; driver communication u
 - For a purely visual pixel change, return the edited image unless a reusable pack is also requested.
 - For unsupported convenience fields, load the full saved state with `get_builder_settings`, preserve untouched fields and follow the native matrix workflow in the advanced reference. Do not silently discard new fields.
 
+## Performance offer badge
+
+`badge_bottom_text` is the LARGE primary offer; `badge_top_text` is optional SMALL supporting text, regardless of their top/bottom names. For an offer such as “15% OFF” or “20% DE DESCUENTO”, keep the whole offer in `badge_bottom_text` and leave `badge_top_text=""` unless the user requests a split. Do not automatically make the percentage small and “OFF” large. Small text is for an actual qualifier such as “From” or “Up to”; never invent one just to fill the field. `badge_small_text_position` moves the small line; it does not change which field is primary.
+
+New performance packs follow web placement when `badge_shift_y` is omitted: `vertical_align="text-top"` resolves to 100 (highest allowed position under the headline/subtitle block); `"logo-top"` resolves to 0. This is upward travel in percent, not a downward pixel offset. Leave it omitted for normal new packs. An omitted per-size Y override inherits the text-set position. Preserve explicit saved positions on ordinary revisions; when asked to repair a lowered badge, set `badge_shift_y=100` for text-top and update any per-size Y overrides that still pin it lower.
+
+Use this complete text-set example for the corresponding English brief:
+
+```json
+{
+  "headline": "Your city. Your ride.",
+  "subtitle": "Book with Yango",
+  "vertical_align": "text-top",
+  "badge_enabled": true,
+  "badge_top_text": "",
+  "badge_bottom_text": "15% OFF",
+  "badge_shift_y": 100
+}
+```
+
+Verify that the badge follows the copy block and does not overlap the logo or disclaimer. Re-render positioning changes with the same source; do not regenerate the scene to fix a layout default. These performance controls are separate from CRM service icons and CRM price-badge X/Y coordinates.
+
 ## Verify and render
 
 1. Reuse a provided public/Yango source URL unchanged. For local/attached JPEG, PNG or WebP up to 20 MB, call `upload_source_image` with Base64 data; local paths are not remote URLs.

@@ -8,6 +8,9 @@ Use `render_performance_matrix` for multiple sources, selected image/text combin
 
 - `imageSets`: up to ten `{imageUrl, bannerSourceUrl}` objects. Preserve a returned expanded `bannerSourceUrl` when reusing a prepared source.
 - `textSets`: up to twenty objects with `title`, `subtitle`, `disclaimer`, `language`, `headlineSize`, `textAlign`, `verticalAlign`, `badgeEnabled`, `badgeTopText`, `badgeBottomText`, `badgeSmallTextPosition`, `badgeShiftX`, `badgeShiftY`, `badgeScale` and `accentColor`. Use `imageIndexes` for selected source combinations.
+- For new native performance matrices, explicitly send `badgeShiftY: 100` for `verticalAlign: "text-top"` or `0` for `"logo-top"`; native API omissions retain backend defaults, not the browser's new-set defaults. `100` moves upward to the highest allowed position under the copy block. Copy the same values into saved editor state and per-size overrides. The convenience renderer resolves omissions automatically.
+- `badgeBottomText` is the LARGE primary offer: use the complete `15% OFF` or localized offer there, with `badgeTopText: ""` unless a small qualifier or split was requested. `badgeSmallTextPosition` changes the small line's position, not the fields' font hierarchy.
+
 - `sizes`: requested performance size keys. Set `renderMode="matrix"`. Queue requests must fit the upstream limit of 100 combinations; split a larger request into batches.
 - `brand`, `logoVariant`, `layoutType`, `driveServiceName`, `coBrandLogoUrl` carry branding. Yandex Go B2B uses `brand="yandex-go-b2b"`, frame layout, locales `en/am/kz/uz/uz-ru/kg/sr/ru`, and yellow `#FFFD72`, navy `#081331`, blue `#BFCCFF` or white `#FFFFFF` accents.
 - `imageScale` is a multiplier (1.1 for 110%); `imageShiftX/Y` are pixels. `bannerImageOverrides`, `bannerBadgeOverrides` and `bannerTextOverrides` target `textSetIndex` and `size`. Consult the contract for available override fields.
