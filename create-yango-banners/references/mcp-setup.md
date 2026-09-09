@@ -17,6 +17,20 @@ The website root is not the MCP endpoint; `/health` proves only that the process
 
 Use the user's designated credential file first if one was provided. A token saved in a text file does not automatically become an environment variable. Read only the named credential; do not source an arbitrary token document as a shell script. If missing or invalid, ask for the correct credential without displaying its value.
 
+## Guided setup with a personal token file
+
+For a client that supports Bearer authentication, help the user finish setup rather than only showing configuration snippets:
+
+1. Check the user's designated credential source first. Reuse an existing valid credential; do not ask the user to enter it again. If the target application only supports OAuth, explain that incompatibility before asking for a Bearer token.
+2. If no credential is available and local file access exists, create a personal copy of [the blank token template](../assets/creative-machine-token.env.example), normally at `~/.config/creative-machine/token.env` (Windows: `%USERPROFILE%/.config/creative-machine/token.env`). Use an explicitly requested personal location instead when supplied. Create missing directories; use owner-only directory/file permissions (0700/0600) on POSIX. Never overwrite an existing credential file or create a secret-bearing file inside a repository, installed skill, plugin, shared folder or publicly hosted artifact directory.
+3. Return a clickable link to the actual personal file using the host's file-link format and absolute path. If the host cannot create a private local file, offer the blank template as a download with instructions to save a personal copy, or use the application's private credential UI. Do not pretend to have created a file in an inaccessible environment, and never upload a filled credential file for linking.
+4. Explain exactly what to fill, in the user's language. For example: «Создал [файл для токена](ABSOLUTE_PERSONAL_FILE_PATH). Вставь токен после `CREATIVE_MACHINE_API_TOKEN=`, сохрани файл и напиши “готово”. Сам токен в чат присылать не нужно». Replace the link placeholder with the real path. Pause authentication-dependent work until the file has been filled; do not generate a replacement image while waiting.
+5. After the user confirms, read only `CREATIVE_MACHINE_API_TOKEN` from that file as data. Reject an empty value/placeholder; never execute/source the document. Do not print the value, include it in tool arguments or shell history, or expose it through config-dump output.
+6. Configure the actual client with that credential using its supported private secret/header settings, preserving unrelated configuration. On a local Codex host that cannot inherit an environment variable, a private `http_headers.Authorization` entry is supported; create/retain owner-only permissions on the private config. Do not write both a stale bearer env reference and a new conflicting header. For another application, use its documented secret mechanism. If its settings are not accessible to the agent, guide the user to enter the credential there; report the remaining manual step honestly.
+7. Restart/reconnect the MCP server, then perform the acceptance check from the application. Report setup complete only after actual MCP calls succeed. A filled file, a saved config or a successful external HTTP probe alone is insufficient. Do not delete the user's credential file after configuring the client unless asked.
+
+This template contains no token and is safe to distribute. Only its personal copy should be filled. Reading a private credential for authorized MCP setup is setup work; it does not permit direct HTTP media generation outside MCP.
+
 ## Codex desktop, CLI and IDE
 
 Configure the same Codex host that will run the task. Merge this block into its private `~/.codex/config.toml`; preserve other servers and existing settings:

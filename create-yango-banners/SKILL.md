@@ -9,7 +9,7 @@ Create and revise these assets exclusively through tools belonging to the connec
 
 ## Required MCP connection and execution boundary
 
-For first-time setup, a missing connection, or authentication trouble, read [MCP installation and verification](references/mcp-setup.md). Installing this skill from SkillStore does not install or authenticate an MCP server. Use the setup instructions for the actual client; do not assume a Codex config also works in Claude Desktop, ChatGPT web, or another host.
+For first-time setup, a missing connection, or authentication trouble, read [MCP installation and verification](references/mcp-setup.md). Installing this skill from SkillStore does not install or authenticate an MCP server. Use the setup instructions for the actual client; do not assume a Codex config also works in Claude Desktop, ChatGPT web, or another host. If a compatible client needs a token and no existing credential is available, create a personal blank token file from the bundled template and give the user a clickable link. After they fill it, configure authentication and verify the connection; never mistake file creation for completed setup.
 
 Before creating or changing media, discover the connected Creative Machine tools and successfully call that server's `get_banner_capabilities`. A matching tool name alone is not enough: verify that the tool belongs to this server. The production endpoint is `https://creativemachiemcp-production.up.railway.app/mcp`; use a different deployment only when the user explicitly selected it.
 
