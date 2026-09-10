@@ -28,17 +28,17 @@ Ride-hailing UAE presets distinguish cities, including Abu Dhabi reference vehic
 
 ## Different creatives and composition selection
 
-Choose scene composition independently from the banner layout (Photo/Frame/etc.) and preserve the brief's fixed conditions. The MCP capability response lists presets by service, style and vehicle. For passenger car photography these are `inside the car`, `near the car`, `getting into the car`, `getting out the car`, `passenger with driver`, `window`, and `free composition`. Moto and tuk-tuk have their own presets; driver and business photography use separate lists. Use the exact supported label, with the camera/action details in `brief`; `preferred_angles` is for automotive services and is not a substitute for a passenger scene brief.
+Choose scene composition independently from the banner layout (Photo/Frame/etc.) and preserve the brief's fixed conditions. The MCP capability response lists presets by service, style and vehicle. For passenger car photography these are `inside the car`, `near the car`, `getting into the car`, `getting out the car`, `passenger with driver`, `window`, and `free composition`. Moto and tuk-tuk have their own presets; driver and business photography use separate lists. Pass the exact supported label as `composition` and a short hero/action description as `brief`. The generator expands these inputs into its production prompt. `preferred_angles` is for automotive services, not passenger scene briefs.
 
 Example for three Yango Abu Dhabi creatives about the first three rides, if the brief leaves scenes open:
 
-| Direction | Composition | Scene treatment |
+| Direction | Composition | Complete brief |
 | --- | --- | --- |
-| City journey | `near the car` | Wide street-level view, taxi small in the frame, passenger approaching, daytime urban context. |
-| Passenger experience | `inside the car` | Medium close-up of the passenger in the rear seat, city visible through the window, car interior as the setting. |
-| Start your ride | `getting into the car` | Medium side view through the open rear door, passenger boarding, architectural entrance background. |
+| City journey | `window` | A young woman rides in the rear seat of a taxi, looking at the city through the open window. |
+| Meeting friends | `near the car` | Two friends beside a taxi. One shows the other something on her phone; both smile. |
+| Start your ride | `getting into the car` | A man with a small travel bag gets into the rear seat of a taxi. |
 
-These are examples, not a fixed carousel to reuse for every brief. Select the combination that communicates the current offer and compare it with earlier visible outputs. Each source prompt should clearly state its own action, viewpoint, scale and space for copy, while keeping the brand, approved vehicle and campaign conditions unchanged. Do not ask the image model to paint the final offer/logo.
+These are complete short briefs, not a fixed carousel or a starting point for a longer photography prompt. Select scenes suited to the current request and earlier visible outputs. Pass country, vehicle/tariff, style and composition through their dedicated fields. Let the generator determine framing, camera, lighting and photographic treatment unless the user explicitly specifies them. Offer, logo and space for copy belong to banner rendering; do not add empty-area or small-subject instructions to the source brief.
 
 For separate scene briefs, call `generate_source_image` once per direction with `count=1`, `composition` equal to the chosen label, and `compositions` omitted or containing that same label. For one compatible shared brief, send the selected `compositions`, set `composition` to the first item, and use `count` as the TOTAL number of sources. Photo/Drivers composition planning currently caps a call at four images and distributes that count across presets; it is not count-per-preset. Split larger requested sets into bounded calls with distinct plans. Never use a shared brief that specifies “full taxi and person outside on the waterfront” for an interior or boarding preset.
 
