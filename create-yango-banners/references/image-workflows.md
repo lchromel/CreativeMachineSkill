@@ -26,6 +26,24 @@ Garage currently lists Peru/Lima (red Kia Soluto, grey DFSK Glory 560) and Azerb
 
 Ride-hailing UAE presets distinguish cities, including Abu Dhabi reference vehicles. Read `get_source_catalog(catalog="vehicles")` before choosing tariff or vehicle values.
 
+## Different creatives and composition selection
+
+Choose scene composition independently from the banner layout (Photo/Frame/etc.) and preserve the brief's fixed conditions. The MCP capability response lists presets by service, style and vehicle. For passenger car photography these are `inside the car`, `near the car`, `getting into the car`, `getting out the car`, `passenger with driver`, `window`, and `free composition`. Moto and tuk-tuk have their own presets; driver and business photography use separate lists. Use the exact supported label, with the camera/action details in `brief`; `preferred_angles` is for automotive services and is not a substitute for a passenger scene brief.
+
+Example for three Yango Abu Dhabi creatives about the first three rides, if the brief leaves scenes open:
+
+| Direction | Composition | Scene treatment |
+| --- | --- | --- |
+| City journey | `near the car` | Wide street-level view, taxi small in the frame, passenger approaching, daytime urban context. |
+| Passenger experience | `inside the car` | Medium close-up of the passenger in the rear seat, city visible through the window, car interior as the setting. |
+| Start your ride | `getting into the car` | Medium side view through the open rear door, passenger boarding, architectural entrance background. |
+
+These are examples, not a fixed carousel to reuse for every brief. Select the combination that communicates the current offer and compare it with earlier visible outputs. Each source prompt should clearly state its own action, viewpoint, scale and space for copy, while keeping the brand, approved vehicle and campaign conditions unchanged. Do not ask the image model to paint the final offer/logo.
+
+For separate scene briefs, call `generate_source_image` once per direction with `count=1`, `composition` equal to the chosen label, and `compositions` omitted or containing that same label. For one compatible shared brief, send the selected `compositions`, set `composition` to the first item, and use `count` as the TOTAL number of sources. Photo/Drivers composition planning currently caps a call at four images and distributes that count across presets; it is not count-per-preset. Split larger requested sets into bounded calls with distinct plans. Never use a shared brief that specifies “full taxi and person outside on the waterfront” for an interior or boarding preset.
+
+Render each returned source as its own creative. Reuse it for its sizes, selected layouts and CRM text/clean variants. A change of crop or headline alone does not count as another visual concept when different scenes were requested.
+
 ## Scooters
 
 Active UI styles are `scooter-3d-2`, `scooter-cinematic-3d` and `scooter-photo`. Cinematic offer generation uses `scooter-cinematic-3d-offer` and requires the exact offer. Older `scooter-3d` and `scooter-3d-offer` routes remain available for compatibility.

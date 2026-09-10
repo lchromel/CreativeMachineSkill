@@ -47,6 +47,18 @@ Example brief: «создай баннер для yango в Абу Даби с о
 
 For revisions preserve the existing brand unless the user names a replacement or reports a wrong logo. When repairing Yandex Go to Yango, set `brand="yango"` and re-render; use `logo_variant="default"` if the usual wordmark is wanted. A stored locale must not override the new brand. CRM uses its own brand and badge controls. Inspect the rendered logo against the requested brand when image inspection is available; an incorrect logo is not a finished result. Repair renderer branding with the same source and return the corrected asset and editor links.
 
+## Choose distinct compositions for different creatives
+
+When the user asks for several different banners, ideas or creatives, choose the source compositions yourself within the brief. Prepare one short direction per requested creative before generating: scene/action, camera viewpoint, shot scale, subject placement and space for copy. For a small set, aim for different composition families and at least two meaningful visual differences between each pair. Changing only the person, outfit, car angle by a few degrees or background decoration is not a new direction. Keep the requested brand, city, vehicle/tariff, offer, audience and any required references consistent; vary only what the brief leaves open.
+
+Use `get_banner_capabilities().source_compositions` and [image workflows](references/image-workflows.md#different-creatives-and-composition-selection) to choose actual supported presets. Tie each composition to the communication: a passenger close-up for the ride experience, boarding for starting a journey, a wider street scene for city coverage. Let the image have useful space for the selected text layout. Briefly state the chosen directions and proceed; do not ask the user to art-direct every camera angle. Preserve explicitly requested identical composition or a controlled test where only copy/layout should vary. Required layout and missing-disclaimer choices still apply; they do not require a separate composition questionnaire.
+
+Generate a tailored brief per direction, usually with `count=1`, the matching `composition` and a consistent `compositions` list. A shared composition mix works when one scene brief truly fits all selected presets. Increasing `count` while leaving the same detailed brief and `free composition` does not establish diversity. Respect the requested total and service limits; distinct sources for requested creative directions are authorized, but extra paid alternatives or automatic rerolls beyond that total are not implied.
+
+Compare the returned sources together before rendering the final pack: subject scale/placement, camera, action and setting should visibly differ while remaining relevant. Consult earlier outputs visible in this task so “ещё варианты” develops new directions rather than repeating the last group. Do not claim memory of unavailable tasks. If a near-duplicate returns, identify it and propose a specific changed direction; do not label it as a distinct success or silently start an open-ended paid retry loop. Render the accepted sources through MCP and identify final groups by their creative direction.
+
+Different sizes, CRM with/without-text exports and comparisons of layouts on one photo are adaptations of one creative. Reuse its source for those operations. A request for different creative scenes calls for different sources, even when all banners use the same brand layout and copy.
+
 ## Choose words, badge text and layout
 
 Keep creative questions concrete. For a new banner, offer layout choices, ask which exact words to emphasize and what text belongs in the badge, and clarify a missing disclaimer. Use the supplied copy in the questions, not an abstract interview about priority, emotion, strategy or the hero. Combine unresolved choices in one short message, in the user's language:
@@ -82,7 +94,7 @@ For other brands, adapt colors and availability using the brand mapping above an
 
 For CRM, ask: «Как оформить CRM: фото с затемнением под текст, фото без затемнения или вариант с чёрным текстом? Можно выбрать несколько». Use `fade`, `no-fade`, and `black-text` respectively. Performance's red/grey/black frames are not CRM layouts. If the user asks for a red CRM scene, distinguish the source-image request from these layout controls.
 
-When several layouts are selected, render each through MCP using the same source, copy and sizes; group outputs and editor links by layout. For CRM, deliver both with-text and without-text exports for every selected layout. Selecting several layouts does not require generating several new source images. Preserve an existing layout during revisions unless the user asks to change or compare it.
+When several layouts are selected for one creative, render each through MCP using that creative's same source, copy and sizes; group outputs and editor links by layout. If several creative directions were requested, apply the selected layouts to each direction's own source. For CRM, deliver both with-text and without-text exports for every selected layout. Selecting several layouts alone does not require generating several new source images. Preserve an existing layout during revisions unless the user asks to change or compare it.
 
 Example after a choice: «Выделяю “первые 3 поездки” цветом, в бейдж ставлю “20% скидка” целиком, лейаут — Photo». Inspect the resulting words, badge and layout against these exact choices.
 
