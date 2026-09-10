@@ -18,6 +18,17 @@ Choose scene composition independently from the banner layout (Photo/Frame/etc.)
 
 Example for three Yango Abu Dhabi creatives about the first three rides, if the brief leaves scenes open:
 
+Example execution announcement (adapt to the actual audience and supported layouts):
+
+«Сделаю сразу три варианта:
+1. На утренник ребёнка — мама с букетом, композиция у окна такси, фото на весь баннер.
+2. После покупок — две подруги с пакетами, композиция рядом с такси, красная рамка.
+3. На деловую встречу — мужчина с дорожной сумкой, композиция посадки, белый лейаут.
+
+Для всех: заголовок “Your first 3 rides”, бейдж “30% OFF”, без дополнительного выделения слов. При желании оформление можно заменить на чёрный лейаут, серую или чёрную рамку. Какой дисклеймер добавить — или делаем без него?»
+
+This announces planned generation; it does not claim the images already exist or ask for concept approval. For an open new banner request, generate three sources by default and render each in its assigned layout. Use any explicitly requested count instead; a precise single execution/revision or ideas-only request does not expand to three. Preserve audience constraints and develop relevant contexts instead of repeating this example. The missing-disclaimer question does not block independent source generation; final text-bearing rendering waits for the answer.
+
 | Direction | Composition | Hero | Situation |
 | --- | --- | --- | --- |
 | Family occasion | `window` | Мама с букетом цветов. | Едет на утренник ребёнка. |
