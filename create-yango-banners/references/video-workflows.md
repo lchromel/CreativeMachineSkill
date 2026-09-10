@@ -6,6 +6,8 @@ All advanced POST tools take `payload` with native field names. Read `get_operat
 
 ## Standard and automotive
 
+- Current text-first Story: call `generate_ridehail_seedance_prompt` with `characterDescription`, `location`, `country`, exact catalogue `transportLabel`, and a short `storyIdea`. Supply requested `merchIds`, screen and voiceover fields. No Image-tab source is required. The server writes the complete prompt and reference manifest. Submit with `mode="standard-story"`, the same character/location/country/tariff/reference inputs, returned `prompt`, `promptIsFinal=true` and matching duration; omit `imageUrl` and `sourceImageUrl` on this path.
+- The image-based story/storyboard paths below are legacy alternatives for a requested existing-image workflow. Do not require an unrelated image to use text-first Story.
 - Automotive: `generate_video_prompt` uses `imageUrl`, `carModel`, optional `colorName` and `basePrompt`.
 - Ride-hailing story: `generate_ridehail_video_scenario` uses `imageUrl`, `brief`, `voiceoverText`, `durationSeconds`, `country`, `transport`.
 - For a storyboard workflow, `generate_ridehail_storyboards` or `start_ridehail_storyboards` takes `imageUrl` and `story`. Select a returned board, then use `prepare_ridehail_video_storyboard` when that workflow requires a prepared source.
@@ -16,11 +18,11 @@ Ordinary Standard generation uses 10 or 15 seconds. The backend additionally per
 
 ## UGC
 
-1. Use `generate_ugc_portraits` with role, country, age, gender, details and optional `avoidPrompts`. Inspect candidates and retain the chosen identity. `save_ugc_portrait` saves the selected `imageUrl` with optional label/prompt/country.
+1. Use `generate_ugc_portraits` with role, country, age, gender, concise casting/wardrobe `details`, requested `merchIds` and optional `avoidPrompts`. The generator creates four distinct studio casting options with its own setup; do not add a photographic superprompt. Inspect candidates and retain the chosen identity. `save_ugc_portrait` saves the selected `imageUrl` with optional label/prompt/country.
 2. Upload requested references. `upload_video` accepts raw `media_base64`, `file_name`, `mime_type` and `purpose="ugc-reference"`; use its `video_public_url`. Reference video is limited to 15 seconds. Ordinary library video supports up to 100 MB/600 seconds.
 3. `upload_audio` accepts an MP3/WAV voiceover up to 15 MB and 2–15 seconds. Use the returned `audio_public_url`. Temporary public reference URLs must be reused exactly, including tokens.
-4. `generate_ugc_video_prompt` takes `portraitImageUrl`, role/country/age/gender, location/speech, `durationSeconds`, `outputType` and optional `locationImageUrl`, `brandingImageUrl`, `screenReferenceType` + `screenReferenceUrl`, `voiceoverReferenceUrl`.
-5. Use the same reference set for `start_video_generation`: `mode="ugc"`, chosen portrait as `imageUrl`, returned full `prompt`, and the same duration/output/reference fields. `outputType="smm"` makes 9:16; `performance` makes 1:1. `screenReferenceType` is `image` or `video` and must match its URL.
+4. `generate_ugc_video_prompt` takes `portraitImageUrl`, role/country/age/gender, location/speech, `durationSeconds`, `outputType` and optional `locationImageUrl`, `brandingImageUrl`, `screenReferenceType` + `screenReferenceUrl`, `voiceoverReferenceUrl`. Supply the exact catalogue `transportLabel` and requested `merchIds`; country/tariff selection resolves the approved vehicle/branding on the server. Keep location/action and speech separate; the generator supplies timing, filming style and reference numbering.
+5. Use the same reference set for `start_video_generation`: `mode="ugc"`, chosen portrait as `imageUrl`, returned full `prompt`, `promptIsFinal=true`, and the same country/tariff/merch/duration/output/reference fields. `outputType="smm"` makes 9:16; `performance` makes 1:1. `screenReferenceType` is `image` or `video` and must match its URL.
 6. Do not reorder or add reference tokens after prompt generation. The backend validates the manifest, registers the AIGC source where required, generates and stores a raw video.
 
 Video submission requires the MCP server's `YANGO_VIDEO_GENERATION_PASSWORD` to match the generator's configured video password. Do not ask the user to put credentials into `payload`. Report a missing configuration clearly; other tools remain usable.

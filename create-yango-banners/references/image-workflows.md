@@ -2,23 +2,7 @@
 
 ## Source generation
 
-`generate_source_image` supports the following service/style decisions. Query capabilities and current catalogues for exact options instead of inventing a preset.
-
-| Service / style | Inputs and behavior |
-| --- | --- |
-| Ride-hailing `photo` | Country, vehicle model and tariff/transport label; visual brief and composition. |
-| Ride-hailing `drivers` | Country, vehicle model, tariff and driver-focused brief. Audience and CRM carrier remain independent decisions. |
-| `yandex-pro` | Scene brief, one or more `yandex_pro_selections`, approved background color. |
-| `yango-pro-illustrations` | Brief, exactly one scene focus, optional exact reference and skin-tone palette. |
-| `3d` | Object or scene brief. |
-| `lucky` | Country, car, tariff and campaign idea; normally four variants with one or more Lucky styles. Split and feedback are for requested variants or iteration. |
-| `reference-scene` | Upload references first; retain URL order and refer to Image 1, Image 2, etc. Queue limit is eight references per request. |
-| `rides-for-business` / `photo` | Country, business car/tariff and B2B visual brief. Yandex Go B2B is a render brand, not a new source service. |
-| `yango-drive` / `photo` | Country, vehicle model, city in city mode, optional color and camera angles. |
-| `yango-motors` / `photo` | Vehicle model, optional angle/weather/location wish. |
-| `rida` / `photo` | Independent `rida_items` with brief, role (`user`, `driver`, `none`) and transport (`car`, `moto`, `none`). `improve_rida_brief` can refine one brief. |
-| `garage` / `photo` | Fetch the `garage` catalogue. Use its exact country/car and, in city mode, an allowed city. Reference sheets determine model and paint. |
-| `scooters` | Select a `scooter-*` style and supply `scooter_options` as needed. |
+Before a new source generation, read [service input ownership](service-inputs.md) and the live `source_input_contract` from `get_banner_capabilities`. Choose the service/style, then fill its actual Hero, Situation or Drive Wish fields. The generator writes the production prompt from those inputs and its guides. `brief` is an optional compatibility fallback, not a required universal prompt.
 
 For Ride-hailing photography, Rides for Business, Drive, Motors and Garage, `location_mode` selects `city` or `countryside`. Supply `location_description` for terrain and atmosphere. Drive/Garage countryside generation does not require a city; keep the target country. `car_logo=false` suppresses automotive branding for the services that support it. Garage identity and color stay tied to its curated sheet.
 
@@ -26,11 +10,11 @@ Garage currently lists Peru/Lima (red Kia Soluto, grey DFSK Glory 560) and Azerb
 
 Ride-hailing UAE presets distinguish cities, including Abu Dhabi reference vehicles. Read `get_source_catalog(catalog="vehicles")` before choosing tariff or vehicle values.
 
-For Ride-hailing Photo, `brief` populates the web Hero field and leaves Situation empty by default. Use `hero_description` and `situation_description` to reproduce the two web fields exactly; an explicit empty string stays empty. Other modes retain their existing brief defaults. When comparing web and MCP, match the selected composition and both fields, not just the sentence: `inside the car` and `getting into the car` are different presets. Country must also match the catalogue value, such as `UAE — Abu Dhabi`. New generation uses `generate_source_image`, which invokes the generator's prompt-writing pipeline; `regenerate_source_image` is for an already finalized prompt.
+For web/MCP comparison, match the selected service, style, country/tariff, composition and both text fields. `inside the car` and `getting into the car` are different presets. Use exact catalogue values, such as `UAE — Abu Dhabi`. New generation uses `generate_source_image`; `regenerate_source_image` requires an already finalized prompt.
 
 ## Different creatives and composition selection
 
-Choose scene composition independently from the banner layout (Photo/Frame/etc.) and preserve the brief's fixed conditions. The MCP capability response lists presets by service, style and vehicle. For passenger car photography these are `inside the car`, `near the car`, `getting into the car`, `getting out the car`, `passenger with driver`, `window`, and `free composition`. Moto and tuk-tuk have their own presets; driver and business photography use separate lists. Pass the exact supported label as `composition` and a short hero/action description as `brief`. The generator expands these inputs into its production prompt. `preferred_angles` is for automotive services, not passenger scene briefs.
+Choose scene composition independently from the banner layout (Photo/Frame/etc.) and preserve the brief's fixed conditions. The MCP capability response lists presets by service, style and vehicle. For passenger car photography these are `inside the car`, `near the car`, `getting into the car`, `getting out the car`, `passenger with driver`, `window`, and `free composition`. Moto and tuk-tuk have their own presets; driver and business photography use separate lists. Pass the exact supported label as `composition` and short descriptions in the Hero/Situation fields appropriate to the selected mode. The generator expands these inputs into its production prompt. `preferred_angles` is for automotive services, not passenger scene briefs.
 
 Example for three Yango Abu Dhabi creatives about the first three rides, if the brief leaves scenes open:
 
@@ -42,7 +26,7 @@ Example for three Yango Abu Dhabi creatives about the first three rides, if the 
 
 These are complete short briefs, not a fixed carousel or a starting point for a longer photography prompt. Select scenes suited to the current request and earlier visible outputs. Pass country, vehicle/tariff, style and composition through their dedicated fields. A time of day (day, evening, night) can be part of the brief; it does not require specifying light direction, softness, rim light or color temperature. Let the generator determine the lighting setup, framing, camera and photographic treatment unless the user explicitly specifies them. Offer, logo and space for copy belong to banner rendering; do not add empty-area or small-subject instructions to the source brief.
 
-For separate scene briefs, call `generate_source_image` once per direction with `count=1`, `composition` equal to the chosen label, and `compositions` omitted or containing that same label. For one compatible shared brief, send the selected `compositions`, set `composition` to the first item, and use `count` as the TOTAL number of sources. Photo/Drivers composition planning currently caps a call at four images and distributes that count across presets; it is not count-per-preset. Split larger requested sets into bounded calls with distinct plans. Never use a shared brief that specifies “full taxi and person outside on the waterfront” for an interior or boarding preset.
+For separate scenes, call `generate_source_image` once per direction with `count=1`, `composition` equal to the chosen label, and `compositions` omitted or containing that same label. For one compatible shared brief, send the selected `compositions`, set `composition` to the first item, and use `count` as the TOTAL number of sources. Photo/Drivers composition planning currently caps a call at four images and distributes that count across presets; it is not count-per-preset. Split larger requested sets into bounded calls with distinct plans. Never use a shared brief that specifies “full taxi and person outside on the waterfront” for an interior or boarding preset.
 
 Render each returned source as its own creative. Reuse it for its sizes, selected layouts and CRM text/clean variants. A change of crop or headline alone does not count as another visual concept when different scenes were requested.
 
