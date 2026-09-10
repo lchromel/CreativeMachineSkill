@@ -120,12 +120,23 @@ Full example request for the colleague:
 
 > Используй create-yango-banners. Сначала проверь подключение к Yango Creative Machine MCP: вызови get_banner_capabilities, get_upstream_readiness и get_source_catalog для vehicles. Сообщи, какие вызовы действительно прошли и доступен ли генератор. Пока ничего не генерируй. Если MCP не подключён или авторизация не работает, остановись и укажи, что нужно исправить в подключении.
 
+## Download authorization
+
+Returned images, videos and ZIPs on the generator website can require HTTP Basic Auth even when MCP calls succeed. Use `WEB_APP_BASIC_AUTH_USERNAME` and `WEB_APP_BASIC_AUTH_PASSWORD`; these are separate from `CREATIVE_MACHINE_API_TOKEN`. A media 401 does not mean generation failed or MCP needs reconnecting.
+
+1. Read those two named fields from the user's designated credential source first, then the personal `~/.config/creative-machine/download.env` if needed. Keep a login/password pair together; do not combine unrelated credentials or assume shared defaults. Read the file as data, not shell code. Do not print values.
+2. If neither source has a complete pair, run `python3 scripts/prepare_token_file.py --kind download`. This creates a blank personal `download.env` outside the skill with owner-only permissions and preserves existing files. Return its actual absolute link and ask the user to enter login/password in the named fields, save, and reply “готово”. Never ask for the password in chat. Without private filesystem access, offer the [blank template](../assets/creative-machine-download.env.example) to save privately, or use the client's private credential UI; do not claim a local file was created.
+3. After “готово”, reread the indicated file. If a pair is already saved, use it without another question. Authenticate downloads of actual returned media URLs with Basic Auth over HTTPS on the expected generator origin (`https://yango-production-60f5.up.railway.app` in production, or an explicitly configured alternative). Do not put credentials in URLs or visible command arguments, and do not forward the Authorization header across origins on redirects.
+4. If that request returns 401, report that the website rejected the saved login/password, link their private source file and ask to correct it. Keep generated URLs and resume downloading after correction; do not resubmit generation. Other download failures need their actual diagnosis rather than repeated password prompts.
+5. Check the download status and content type so an HTML login page is not presented as an image or ZIP. Save returned bytes unchanged and inspect the media/archive when available. Keep filled files outside installed skills, repositories and published packages.
+
 ## Diagnose failures
 
 | Symptom | Next action |
 | --- | --- |
 | Skill appears, MCP tools absent | Configure/enable the server in this application and refresh its tool catalogue. |
 | 401/403 from `/mcp` | Check the MCP credential, the process environment and competing auth settings; do not replace it with an upstream/provider token. |
+| 401 from a returned image/video/ZIP URL | Use the website Basic Auth login/password through the download authorization flow above; do not replace the MCP token or regenerate the asset. |
 | Capabilities succeed but readiness/catalogue fail | Server connection works; inspect upstream credentials/service health on the server. |
 | OAuth login/discovery fails | This deployment is Bearer-only; use a compatible client or have the operator add OAuth. |
 | Tool call times out | Prefer advanced queued operations and poll existing IDs; never resubmit an unknown paid operation just because the client timed out. |
