@@ -18,13 +18,13 @@ Choose scene composition independently from the banner layout (Photo/Frame/etc.)
 
 Example for three Yango Abu Dhabi creatives about the first three rides, if the brief leaves scenes open:
 
-| Direction | Composition | Complete brief |
-| --- | --- | --- |
-| City journey | `window` | A young woman rides in the rear seat of a taxi, looking at the city through the open window. |
-| Meeting friends | `near the car` | Two friends beside a taxi. One shows the other something on her phone; both smile. |
-| Start your ride | `getting into the car` | A man with a small travel bag gets into the rear seat of a taxi. |
+| Direction | Composition | Hero | Situation |
+| --- | --- | --- | --- |
+| Family occasion | `window` | Мама с букетом цветов. | Едет на утренник ребёнка. |
+| After shopping | `near the car` | Две подруги с пакетами покупок. | Возвращаются из магазина. |
+| Business meeting | `getting into the car` | Мужчина с небольшой дорожной сумкой. | Опаздывает на совещание. |
 
-These are complete short briefs, not a fixed carousel or a starting point for a longer photography prompt. Select scenes suited to the current request and earlier visible outputs. Pass country, vehicle/tariff, style and composition through their dedicated fields. A time of day (day, evening, night) can be part of the brief; it does not require specifying light direction, softness, rim light or color temperature. Let the generator determine the lighting setup, framing, camera and photographic treatment unless the user explicitly specifies them. Offer, logo and space for copy belong to banner rendering; do not add empty-area or small-subject instructions to the source brief.
+These are complete description fields, not a fixed carousel or a starting point for a longer photography prompt. Situation gives the life context; the selected composition supplies physical staging such as boarding or sitting inside. Choose contexts suited to the request and earlier visible outputs; leave Situation empty when no context is needed. Pass country, vehicle/tariff, style and composition through their dedicated fields. A time of day (day, evening, night) can be part of the context. Let the generator determine lighting, framing, camera and photographic treatment unless the user explicitly specifies them. Offer, logo and space for copy belong to banner rendering.
 
 For separate scenes, call `generate_source_image` once per direction with `count=1`, `composition` equal to the chosen label, and `compositions` omitted or containing that same label. For one compatible shared brief, send the selected `compositions`, set `composition` to the first item, and use `count` as the TOTAL number of sources. Photo/Drivers composition planning currently caps a call at four images and distributes that count across presets; it is not count-per-preset. Split larger requested sets into bounded calls with distinct plans. Never use a shared brief that specifies “full taxi and person outside on the waterfront” for an interior or boarding preset.
 

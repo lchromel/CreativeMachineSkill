@@ -9,11 +9,13 @@ Prefer the explicit web fields in `generate_source_image`:
 | MCP field | Web/native field | Purpose |
 | --- | --- | --- |
 | `hero_description` | Hero / `modelDescription` | Who appears: relevant identity, clothes and accessories. |
-| `situation_description` | Situation / `situationDescription` | What happens, or the object/idea requested in modes without a separate hero. |
+| `situation_description` | Situation / `situationDescription` | For passenger/business/scooter Photo: the life context or purpose of the trip. Other modes use this field for their object/idea or service-specific story. |
 | `scene_wish` | Drive Wish / `driveWish` | Optional automotive scene wish for Drive, Motors and Garage. |
 | `brief` | Compatibility fallback | Used only if explicit fields are omitted; goes to the one field listed below, never both. |
 
 An explicit empty string stays empty. When either Hero or Situation is provided, the unspecified other field stays empty and `brief` is not copied into it. Automotive uses `scene_wish` (or `brief` if omitted) and leaves Hero/Situation empty. Descriptions are optional where the web permits it; do not invent filler text to satisfy a universal required brief.
+
+For photographic trip scenes, Hero describes who the person is; Situation describes why they travel or what is happening in their life: late for a meeting, going to a child’s school performance, returning from shopping. The composition preset supplies boarding, sitting inside, being beside the car and other physical staging. Leave Situation empty if no context is needed; do not fill it by paraphrasing the preset. Preserve an explicitly requested action without inventing extra staging.
 
 Use concise ordinary language. A time of day, weather, place or action can be meaningful content. Photographic light direction, softness, rim light, color temperature, lens, exposure, framing and empty space are already developed by the selected pipeline; add them only for an explicit user request. Keep campaign copy, badges, logos and banner positioning in render fields. Dedicated offer-in-image styles are the exception described below.
 
@@ -24,7 +26,7 @@ Country, tariff, car, color, composition and references have their own controls.
 | Service / style | Agent supplies | Generator already supplies | `brief` fallback |
 | --- | --- | --- | --- |
 | Ride-hailing / `photo` | Exact country/tariff/car, composition; optional Hero and Situation, face reference if requested. Both descriptions may be empty. | Urban Fashion / Documentary guide, casting defaults, local architecture/clothes, composition rules and reference, vehicle/livery reference where available, road geometry and photographic treatment. | Hero only. |
-| Ride-hailing / `drivers` | Country/tariff/car, a driver composition, required Situation describing the driver and action together. | Driver-only documentary guide, practical clothing defaults, local context, car as supporting context, composition reference and photography. | Situation only. |
+| Ride-hailing / `drivers` | Country/tariff/car, a driver composition, required Situation describing the driver and work context together; the driver preset supplies physical staging. | Driver-only documentary guide, practical clothing defaults, local context, car as supporting context, composition reference and photography. | Situation only. |
 | `rides-for-business` / `photo` | Country/tariff/car, business composition, optional Hero and Situation. Put the business task in Situation. | Business editorial guide; Situation is the dominant story. It decides whether a car belongs in an office/lunch/meeting scene rather than forcing a taxi into every scene. | Situation only. |
 | `yango-drive` / `photo` | Country/city and car, paint if wanted, supported automotive angle(s), optional scene wish. Countryside uses terrain description instead of a required city. | Vehicle classification/year, local scene selection and references, automotive prompt structure, camera/road logic and lighting. | Drive Wish only; optional. |
 | `yango-motors` / `photo` | Car, optional supported angle, `weather`, scene wish and location mode. Default market/city is Cote d'Ivoire / Abidjan. | Model reference and paint from that reference, Abidjan location reference, weather guide, cinematic automotive treatment. | Drive Wish only; optional. |
@@ -45,13 +47,13 @@ Face references are used by passenger/business Photo and Scooter Photo. Drivers 
 
 ## Complete short description examples
 
-Keep each example as short as shown unless the user supplied more necessary content. Preserve their actual people, place and action rather than reusing these examples for every request.
+Keep each example as short as shown unless the user supplied more necessary content. Preserve their actual people and life context rather than reusing these examples for every request.
 
 | Mode | Exact description fields |
 | --- | --- |
-| Passenger Photo | Hero: `Мужчина с небольшой дорожной сумкой.` Situation: `Садится на заднее сиденье такси. Вечер.` Composition: `getting into the car`. |
-| Drivers | Situation: `Водитель около 35 лет проверяет приложение перед началом работы в припаркованной машине.` Composition: `driver inside car`. |
-| Business | Hero: `Сотрудница компании с ноутбуком.` Situation: `Дорабатывает презентацию по дороге на встречу.` Composition: `back-seat work`. |
+| Passenger Photo | Hero: `Мужчина с небольшой дорожной сумкой.` Situation: `Опаздывает на совещание.` Composition: `getting into the car`. |
+| Drivers | Situation: `Водитель около 35 лет начинает рабочую смену.` Composition: `driver inside car`. |
+| Business | Hero: `Сотрудница компании с ноутбуком.` Situation: `Едет на встречу с новым клиентом.` Composition: `back-seat work`. |
 | Drive / Motors / Garage | Scene wish: `Машина припаркована возле офиса вечером.` Car, city and angle are separate controls. |
 | 3D | Situation: `Открытый дорожный чемодан с наушниками внутри.` |
 | Yandex Pro illustration | Situation: `Водитель проверяет заказы в телефоне.` Select the corresponding ingredients separately. |
@@ -59,7 +61,7 @@ Keep each example as short as shown unless the user supplied more necessary cont
 | Lucky | Situation: `Экономия на первых поездках даёт больше свободы для планов на день.` Select Lucky styles separately. |
 | Reference Scene | Situation: `Герой из Image 2 отдыхает на скамейке в визуальном стиле Image 1.` Upload the two authorized references in that order. |
 | RIDA | Item brief: `Пользователь выбирает удобную цену поездки.` Role `user`, transport `car`. |
-| Scooter Photo | Hero: `Две подруги.` Situation: `Едут по велодорожке днём.` Photo composition `two-riders`. |
+| Scooter Photo | Hero: `Две подруги.` Situation: `Спешат на встречу с друзьями после учёбы.` Photo composition `two-riders`. |
 | Scooter 3D | Situation: `Самокат среди крупных весенних цветов.` Select the 3D style separately. |
 
 ## Counts and predefined outputs
