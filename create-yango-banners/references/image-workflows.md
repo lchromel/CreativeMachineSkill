@@ -26,6 +26,8 @@ Garage currently lists Peru/Lima (red Kia Soluto, grey DFSK Glory 560) and Azerb
 
 Ride-hailing UAE presets distinguish cities, including Abu Dhabi reference vehicles. Read `get_source_catalog(catalog="vehicles")` before choosing tariff or vehicle values.
 
+For Ride-hailing Photo, `brief` populates the web Hero field and leaves Situation empty by default. Use `hero_description` and `situation_description` to reproduce the two web fields exactly; an explicit empty string stays empty. Other modes retain their existing brief defaults. When comparing web and MCP, match the selected composition and both fields, not just the sentence: `inside the car` and `getting into the car` are different presets. Country must also match the catalogue value, such as `UAE — Abu Dhabi`. New generation uses `generate_source_image`, which invokes the generator's prompt-writing pipeline; `regenerate_source_image` is for an already finalized prompt.
+
 ## Different creatives and composition selection
 
 Choose scene composition independently from the banner layout (Photo/Frame/etc.) and preserve the brief's fixed conditions. The MCP capability response lists presets by service, style and vehicle. For passenger car photography these are `inside the car`, `near the car`, `getting into the car`, `getting out the car`, `passenger with driver`, `window`, and `free composition`. Moto and tuk-tuk have their own presets; driver and business photography use separate lists. Pass the exact supported label as `composition` and a short hero/action description as `brief`. The generator expands these inputs into its production prompt. `preferred_angles` is for automotive services, not passenger scene briefs.

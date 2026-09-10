@@ -1,7 +1,7 @@
 {
   "name": "create-yango-banners",
-  "revision": 8,
-  "content_sha256": "151bd1f29d3afa71e4fc2ed95e8468579c19c7db85bfe974bb91d7c0a28109f9",
+  "revision": 9,
+  "content_sha256": "454119675d86d4718af947c85b8987faa88481b7d87ce1233a751f6b1e9f6dd3",
   "skillstore_url": "https://skillstore.yandex-team.ru/skills/create-yango-banners",
   "github_url": "https://github.com/lchromel/CreativeMachineSkill"
 }
