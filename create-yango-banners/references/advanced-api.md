@@ -16,7 +16,7 @@ Use `render_performance_matrix` for multiple sources, selected image/text combin
 - `brand`, `logoVariant`, `layoutType`, `driveServiceName`, `coBrandLogoUrl` carry branding. Set `brand` from the brief in both render payload and saved settings. `logoVariant` selects a supported variant within that brand; locale must never replace brand identity. For the usual Yango wordmark use `brand="yango"`, `logoVariant="default"`; for English Yandex Go use `brand="yandex-go"`, `logoVariant="en"`, regardless of country. Copy language is separate. Yandex Go B2B uses `brand="yandex-go-b2b"`, frame layout, locales `en/am/kz/uz/uz-ru/kg/sr/ru`, and yellow `#FFFD72`, navy `#081331`, blue `#BFCCFF` or white `#FFFFFF` accents.
 - `imageScale` is a multiplier (1.1 for 110%); `imageShiftX/Y` are pixels. `bannerImageOverrides`, `bannerBadgeOverrides` and `bannerTextOverrides` target `textSetIndex` and `size`. Consult the contract for available override fields.
 
-Do not expect raw matrix rendering to create an archive or editable link. After it succeeds, use `create_banners_zip` with the actual `bannerUrls` and `save_builder_settings` with the corresponding full editor state. Preserve original settings when revising a loaded state.
+Do not expect raw matrix rendering to create an archive or editable link. After it succeeds, save the corresponding full editor state with `save_builder_settings` and show previews. Only after a download/export request use `export_banner_pack` with the selected existing URLs; ZIP creation allocates permanent IDs even with `trackFinal=false`. Preserve original settings when revising a loaded state.
 
 ## CRM matrices
 
@@ -33,7 +33,7 @@ Default CRM delivery includes both with-text and without-text exports. For nativ
 
 1. Submit the normal payload with `hideTextAndBadges=false` and wait for success.
 2. Copy it, set `hideTextAndBadges=true`, and reuse returned prepared `source_image_url` values per image as `imageSets[].bannerSourceUrl`. Keep the same image/placement/text-option combinations and crop overrides; retain layout/fade settings. Submit and wait for success. Do not ask the image model to generate a clean copy.
-3. Check that both results cover the requested images, placements, options and sizes. Group actual URLs as `with_text` and `without_text`; create one ZIP with `{url, folder}` entries for both folders. Save the original text-bearing builder state for the editor link, rather than erasing its copy.
+3. Check that both results cover the requested images, placements, options and sizes. Keep actual URLs for both `with_text` and `without_text` preview groups. Only on an export request, pass selected `{url, folder}` entries to `export_banner_pack`; it keeps distinct draft packs separate even when folder labels match. Save the original text-bearing builder state for the editor link, rather than erasing its copy.
 4. If the user explicitly requests only one variant, render only that variant. The convenience tools perform the paired workflow by default and accept `include_textless=false` for with-text only.
 
 The queue permits at most 30 placement entries per request, in each variant. Use `category="crm"` for archives or sharing. Native clean mode hides text and badges, not source pixels or the layout's fade.

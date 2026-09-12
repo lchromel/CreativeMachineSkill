@@ -49,7 +49,7 @@ For revisions preserve the existing brand unless the user names a replacement or
 
 ## Choose distinct compositions for different creatives
 
-For an open new banner request, create three finished creative variants by default, including a generic singular "создай баннер". Briefly state the three directions and proceed without asking the user to choose concepts or approve the default count. Each variant combines a relevant life context, a distinct supported scene composition and a suitable supported banner layout. Choose concrete headline/highlight/badge treatments from the supplied copy. The default scope includes three source generations and their requested size/CRM adaptations, not extra rerolls.
+For an open new banner request, create three fully rendered banner previews by default, including a generic singular "создай баннер". Briefly state the three directions and proceed without asking the user to choose concepts or approve the default count. Each variant combines a relevant life context, a distinct supported scene composition and a suitable supported banner layout. Choose concrete headline/highlight/badge treatments from the supplied copy. The default scope includes three source generations and their requested size/CRM adaptations, not extra rerolls.
 
 Use an explicitly requested count instead. "One only", an exact single execution, an existing-image revision or a request just to suggest ideas keeps its own scope. "На твой вкус" accepts the three-variant default for an open new banner request. Preserve fixed audience, scene, offer and layout constraints; vary the remaining dimensions. When both sources and layouts vary, pair one layout with each source to produce three directions, not all nine source/layout combinations. Different sizes or text/clean CRM exports are adaptations of those directions.
 
@@ -190,17 +190,29 @@ Verify that the badge follows the copy block and does not overlap the logo or di
 7. Start image positioning at 100% and zero shift. Positive X moves right; positive Y moves down; shifts use 50-pixel increments. Use per-output overrides when one global crop cannot fit the pack.
 8. Performance badge shifts are 0–100 in steps of 5; scale is 70–150% in steps of 5. Set defaults on the text set and individual-size values through `badge_overrides`. Revisions use `performance_badge_overrides`. `badge_small_text_position` chooses top/bottom; CRM revisions expose independent `price_badge_*` fields.
 9. Re-render the same source after positioning changes; avoid another paid generation solely for crop adjustments.
-10. Verify successful status, asset count, representative square/vertical outputs and archive contents when practical. Return all requested asset URLs grouped by variant/size/placement, ZIP, editable link and warnings.
+10. Verify successful status, asset count and representative square/vertical previews. Show the previews grouped by direction and return editable links and warnings. Create an archive only at the export stage below, then verify its contents.
 
 ## CRM exports: with text and without text together
 
-By default, deliver BOTH variants for every requested CRM image/placement: **with text** and **without text**. This is the normal export, not a choice to ask the user about. `render_in_app_pack` and CRM `revise_banner_from_edit_link` calls now include both when `include_textless` is omitted/true. Each returned banner has `variant: "with_text"` or `"without_text"`; the common ZIP separates them into those two folders. Return both groups of asset links and the combined archive. Set `include_textless=false` only if the user explicitly requests with-text only. For explicitly clean-only output use the native CRM workflow.
+By default, deliver BOTH variants for every requested CRM image/placement: **with text** and **without text**. This is the normal export, not a choice to ask the user about. `render_in_app_pack` and CRM `revise_banner_from_edit_link` calls now include both when `include_textless` is omitted/true. Each returned banner has `variant: "with_text"` or `"without_text"`; the common ZIP separates them into those two folders. Show both variant groups as previews; create the combined archive only when export is requested. Set `include_textless=false` only if the user explicitly requests with-text only. For explicitly clean-only output use the native CRM workflow.
 
 The clean variant uses the generator's native `hideTextAndBadges=true`: overlay text, disclaimers and badges are hidden; source imagery, crops, placement sizes and layout treatment are retained. Do not remove text by editing the source image, blank the saved copy, or switch `fade` to `no-fade`. Baked-in text inside a source is not removed by this switch. The editable link preserves the filled text and badge settings; it does not pretend to save a separate clean-mode toggle.
 
 For advanced `render_crm_matrix`, follow the paired rendering steps in [advanced API](references/advanced-api.md). Reuse the same prepared sources and positioning. A queued response, missing clean variant, or mismatched set is not a completed dual export. After a partial failure, inspect returned task IDs and completed outputs; do not restart source generation or repeat an unknown paid submission.
 
 When Disk sharing is explicitly requested, include BOTH groups under distinguishable variant folders (and image groups where relevant). Do not silently upload only the first variant or the ZIP instead of its constituent images.
+
+## Preview first; export selected versions later
+
+New banners and every revision default to previews: call `render_banner_pack`, `render_in_app_pack` or `revise_banner_from_edit_link` with `create_zip=false` (the default). Native matrix renders already return preview files. Show actual rendered previews with their copy, badge and logo, plus editable links. The default three directions are three previews, not three final exports. Label them by direction/number, not by permanent campaign IDs.
+
+Renderers return immutable `draft-*` URLs and `delivery_stage="preview"`. Store the exact returned URLs for every variant/size so the selected version can be exported later. A private local copy needed to display/inspect a preview is allowed and does not finalize it; do not proactively download the whole deliverable set or prepare a ZIP at this stage. Viewing a preview is not a request to export it.
+
+Only when the user asks to download/export selected versions (for example, "скачай второй" or "выгрузи все") call `export_banner_pack(assets=[...], category="perf" or "crm")` with those existing preview URLs. Preserve the selected sizes and CRM text/clean pair; use `folder` to organize the ZIP. If the selected versions are ambiguous, clarify that selection only. An earlier explicit instruction to export the finished set already authorizes this step; do not ask again. A generic "создай баннер" or a correction request does not authorize final export.
+
+Export allocates permanent IDs and packages the existing files; do not render again or generate new sources to download them. Archive creation consumes IDs even with `trackFinal=false`; that flag controls statistics, not numbering. Never call `create_banners_zip` to make previews. `create_zip=true` remains an explicit final-export shortcut for a request that already authorizes export. Yandex Disk sharing also finalizes files and only happens on an explicit sharing request.
+
+After export, download the returned ZIP using the website login flow below. Reuse that ZIP on authentication/network retries instead of creating a new archive. Individual final filenames/IDs live in the ZIP; preserve them when extracting and delivering files. Do not rename the draft URL into a fabricated permanent URL. For a repeated export, reuse the prior archive when available; the backend deduplicates numbering for the exact same selected URL group, while a revised version or changed size subset can receive a new ID. Pre-export corrections stay unnumbered.
 
 ## Deliver and manage media
 
