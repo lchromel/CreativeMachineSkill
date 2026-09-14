@@ -106,9 +106,23 @@ Example after a choice: «Выделяю “первые 3 поездки” ц�
 
 ## Balance line breaks and size short headlines
 
-Treat line breaks and headline size as part of composition; handle them without another interview unless the user specifies them. Preserve the approved words, offer conditions, disclaimer and inline emphasis. Use real newline characters in headline/subtitle fields (`\n` in JSON), not visible backslash-n text, HTML tags or extra spaces. Break at phrase boundaries to make lines reasonably similar in visual width and avoid a long first line with a lone short word below. Keep numbers with their units and qualifiers with their offers. Visual width matters more than equal character counts; do not distort the sentence merely to make identical line lengths. Keep a short phrase on one line if it fits.
+Treat line breaks and headline size as part of composition; handle them without another interview unless the user specifies them. Preserve the approved words, offer conditions, disclaimer and inline emphasis. Build headline/subtitle values as actual multiline strings. Let the tool/JSON serializer escape line breaks once; do not pre-escape them or paste backslash-n characters into the text. MCP normalizes accidental literal newline escapes in banner copy and saved editor fields, but the intended input is real multiline text. Keep Unicode and inline emphasis intact; do not use a general escape decoder or HTML tags. Break at phrase boundaries to make lines reasonably similar in visual width and avoid a long first line with a lone short word below. Keep numbers with their units and qualifiers with their offers. Visual width matters more than equal character counts; do not distort the sentence merely to make identical line lengths. Keep a short phrase on one line if it fits.
 
-For example, prefer the complete headline `YOUR FIRST\n3 RIDES` over `YOUR FIRST 3\nRIDES` when a two-line block is needed. Preserve all words and check the actual rendered width. Inspect square, landscape and vertical outputs separately: the same line breaks may not fit every size. Use native performance `bannerTextOverrides` and matching saved `textOverrides` for size-specific copy/size, or separate MCP renders; use per-placement text options for CRM. Read [advanced API](references/advanced-api.md) for these fields.
+Complete two-line headline example (the newline below is part of the value):
+
+```text
+YOUR FIRST
+3 RIDES
+```
+
+For the city/ride headline, send the complete value:
+
+```text
+YOUR CITY.
+YOUR RIDE.
+```
+
+Preserve all words and check the actual rendered width. Inspect square, landscape and vertical outputs separately: the same line breaks may not fit every size. Use native performance `bannerTextOverrides` and matching saved `textOverrides` for size-specific copy/size, or separate MCP renders; use per-placement text options for CRM. Read [advanced API](references/advanced-api.md) for these fields.
 
 For short performance headlines, try `headline_size="L"` or `"XL"` when the layout has room; default `M` should not leave the main message unnecessarily small. Supported sizes are `S`, `M`, `L`, `XL` (native/editor `headlineSize`); old `small/medium/large` convenience values map to `S/M/L`. These scale the whole headline, not selected words or the subtitle. The renderer may reduce the font to fit; inspect for clipping, unwanted extra lines, overlaps with the badge/logo, and hierarchy. Keep a user-selected size unless asked to adjust it. CRM uses placement-specific typography and has no general `headline_size` control: balance its copy with supported fields rather than inventing a font-size parameter.
 
