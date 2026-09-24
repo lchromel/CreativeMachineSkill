@@ -25,7 +25,7 @@ Ordinary Standard generation uses 10 or 15 seconds. The backend additionally per
 5. Use the same reference set for `start_video_generation`: `mode="ugc"`, chosen portrait as `imageUrl`, returned full `prompt`, `promptIsFinal=true`, and the same country/tariff/merch/duration/output/reference fields. `outputType="smm"` makes 9:16; `performance` makes 1:1. `screenReferenceType` is `image` or `video` and must match its URL.
 6. Do not reorder or add reference tokens after prompt generation. The backend validates the manifest, registers the AIGC source where required, generates and stores a raw video.
 
-Video submission requires the MCP server's `YANGO_VIDEO_GENERATION_PASSWORD` to match the generator's configured video password. Do not ask the user to put credentials into `payload`. Report a missing configuration clearly; other tools remain usable.
+Video submission uses the same account-issued personal token as other MCP tools. The account must have the Video capability. Do not put credentials into `payload`; report a permission denial clearly.
 
 ## Edit and export existing video
 

@@ -13,7 +13,7 @@ Install/update `create-yango-banners` and configure the MCP connection separatel
 | Local credential name | `CREATIVE_MACHINE_API_TOKEN` (raw token, without `Bearer `) |
 | Public health check | `https://creativemachiemcp-production.up.railway.app/health` |
 
-The website root is not the MCP endpoint; `/health` proves only that the process is alive. The MCP token must match the deployed server's `MCP_API_TOKEN`. It is separate from generator Basic Auth, provider keys, video passwords, and SkillStore authentication. Never put it in a URL, a shared skill, a repository, or an agent reply.
+The website root is not the MCP endpoint; `/health` proves only that the process is alive. After your account is approved, create a personal token at [Account → MCP tokens](https://yango-production-60f5.up.railway.app/account#mcp-tokens). It is shown once, lasts 90 days and can be revoked there. The MCP server validates it with the generator on every HTTP request, including initialization and tool discovery, and forwards that same token for tools. It is also used for protected media downloads. Provider keys and Yandex Disk OAuth stay on the generator. Never put the personal token in a URL, a shared skill, a repository, or an agent reply.
 
 Use the user's designated credential file first if one was provided. A token saved in a text file does not automatically become an environment variable. Read only the named credential; do not source an arbitrary token document as a shell script. If missing or invalid, ask for the correct credential without displaying its value.
 
@@ -31,7 +31,7 @@ For a client that supports Bearer authentication, help the user finish setup rat
 
 This template contains no token and is safe to distribute. Only its personal copy should be filled. Reading a private credential for authorized MCP setup is setup work; it does not permit direct HTTP media generation outside MCP.
 
-If an old client configuration reports missing `MCP_API_TOKEN`, inspect the credential setting for this connection. New client templates use `CREATIVE_MACHINE_API_TOKEN`; the server's Railway variable remains `MCP_API_TOKEN`. Align the client with the named credential source or a supported private header; do not rename the deployed server variable. A missing client environment variable is a setup task, not evidence that the user must edit the server.
+If an old client configuration reports missing `MCP_API_TOKEN`, inspect the credential setting for this connection. New client templates use `CREATIVE_MACHINE_API_TOKEN`. Align the client with the account-issued token in the named credential source or a supported private header. A missing client environment variable is a client setup task.
 
 ## Codex desktop, CLI and IDE
 
@@ -61,7 +61,7 @@ See [Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=
 
 Use the personal-file workflow by default. If the user is already using terminal entry, diagnose that path instead of assuming they edited a file. Ask for the complete command without the token if it is cropped or unavailable.
 
-First inspect this connection's configured credential name without printing credentials. The current plugin uses `CREATIVE_MACHINE_API_TOKEN`. Align a legacy client setting that still points to `MCP_API_TOKEN` with the current client name before prescribing a command. Leave the server's Railway `MCP_API_TOKEN` setting unchanged. Do not change unrelated MCP connections.
+First inspect this connection's configured credential name without printing credentials. The current plugin uses `CREATIVE_MACHINE_API_TOKEN`. Align a legacy client setting that still points to `MCP_API_TOKEN` with the current client name before prescribing a command. Do not change unrelated MCP connections.
 
 For terminal entry on macOS with the current environment-based client configuration, provide this complete command in a fenced code block, exactly with literal underscores:
 
@@ -104,7 +104,7 @@ Supply the raw token to the Claude Code process, approve this project connection
 
 Check the actual application's supported transports and authentication before editing its settings. Use the connection contract above in a client that accepts Streamable HTTP and a Bearer token/custom Authorization header. Placeholder expansion and config filenames differ by application; never assume Claude Code's `.mcp.json` is portable to every client. A stdio-only client requires a separately installed, trusted MCP transport bridge supporting authenticated Streamable HTTP; a remote URL is not a stdio command.
 
-The current deployment implements static Bearer authentication and does not implement an OAuth authorization server or discovery. A connector that only offers OAuth or unauthenticated access cannot authenticate to this deployment as-is. ChatGPT web's documented developer-mode choices are OAuth, No Authentication and Mixed Authentication; local Codex configuration is not imported there. Supporting such a connector requires the server operator to deploy a compatible OAuth integration and then register/connect it in that application. Do not describe this step as completed, select No Authentication for this protected server, disable server authentication, or put the shared token in the URL as a workaround.
+The current deployment accepts account-issued Bearer tokens and does not implement an OAuth authorization server or discovery. A connector that only offers OAuth or unauthenticated access cannot authenticate to this deployment as-is. ChatGPT web's documented developer-mode choices are OAuth, No Authentication and Mixed Authentication; local Codex configuration is not imported there. Supporting such a connector requires the server operator to deploy a compatible OAuth integration and then register/connect it in that application. Do not describe this step as completed or select No Authentication for this protected server.
 
 See [ChatGPT developer-mode authentication](https://developers.openai.com/api/docs/guides/developer-mode). Confirm the target client's current official documentation if its connection UI differs. Until a compatible authenticated MCP connection exists, stop creative work and report the setup gap.
 
@@ -122,21 +122,20 @@ Full example request for the colleague:
 
 ## Download authorization
 
-Returned images, videos and ZIPs on the generator website can require HTTP Basic Auth even when MCP calls succeed. Use `WEB_APP_BASIC_AUTH_USERNAME` and `WEB_APP_BASIC_AUTH_PASSWORD`; these are separate from `CREATIVE_MACHINE_API_TOKEN`. A media 401 does not mean generation failed or MCP needs reconnecting.
+Returned images, videos and ZIPs are scoped to the account that created them. Use the same `CREATIVE_MACHINE_API_TOKEN` personal Bearer token as the MCP connection when downloading actual returned media URLs. To view history or edit links in a browser, sign in as the same account.
 
-1. Read those two named fields from the user's designated credential source first, then the personal `~/.config/creative-machine/download.env` if needed. Keep a login/password pair together; do not combine unrelated credentials or assume shared defaults. Read the file as data, not shell code. Do not print values.
-2. If neither source has a complete pair, run `python3 scripts/prepare_token_file.py --kind download`. This creates a blank personal `download.env` outside the skill with owner-only permissions and preserves existing files. Return its actual absolute link and ask the user to enter login/password in the named fields, save, and reply “готово”. Never ask for the password in chat. Without private filesystem access, offer the [blank template](../assets/creative-machine-download.env.example) to save privately, or use the client's private credential UI; do not claim a local file was created.
-3. After “готово”, reread the indicated file. If a pair is already saved, use it without another question. Authenticate downloads of actual returned media URLs with Basic Auth over HTTPS on the expected generator origin (`https://yango-production-60f5.up.railway.app` in production, or an explicitly configured alternative). Do not put credentials in URLs or visible command arguments, and do not forward the Authorization header across origins on redirects.
-4. If that request returns 401, report that the website rejected the saved login/password, link their private source file and ask to correct it. Keep generated URLs and resume downloading after correction; do not resubmit generation. Other download failures need their actual diagnosis rather than repeated password prompts.
-5. Check the download status and content type so an HTML login page is not presented as an image or ZIP. Save returned bytes unchanged and inspect the media/archive when available. Keep filled files outside installed skills, repositories and published packages.
+1. Read the user's designated personal token source as data. Never print the token or put it in a URL.
+2. Send `Authorization: Bearer <token>` only over HTTPS to the expected generator origin (`https://yango-production-60f5.up.railway.app` in production, or an explicitly configured alternative). Disable automatic cross-origin redirects so the header cannot be forwarded elsewhere.
+3. If a download returns 401/403, keep the generated URL and report that this account cannot access the asset or its token was rejected. Correct account access or token setup, then retry only the download; do not resubmit generation.
+4. Check status and content type so an HTML error page is not presented as an image or ZIP. Save returned bytes unchanged and inspect the media/archive when available.
 
 ## Diagnose failures
 
 | Symptom | Next action |
 | --- | --- |
 | Skill appears, MCP tools absent | Configure/enable the server in this application and refresh its tool catalogue. |
-| 401/403 from `/mcp` | Check the MCP credential, the process environment and competing auth settings; do not replace it with an upstream/provider token. |
-| 401 from a returned image/video/ZIP URL | Use the website Basic Auth login/password through the download authorization flow above; do not replace the MCP token or regenerate the asset. |
+| 401/403 from `/mcp` | Check the personal account token, process environment, account approval and competing auth settings. |
+| 401/403 from a returned image/video/ZIP URL | Use the same account token and check ownership; do not regenerate the asset. |
 | Capabilities succeed but readiness/catalogue fail | Server connection works; inspect upstream credentials/service health on the server. |
 | OAuth login/discovery fails | This deployment is Bearer-only; use a compatible client or have the operator add OAuth. |
 | Tool call times out | Prefer advanced queued operations and poll existing IDs; never resubmit an unknown paid operation just because the client timed out. |

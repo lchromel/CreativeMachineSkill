@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 
 
-def prepare_token_file(path: Path, kind: str = "mcp") -> dict[str, object]:
+def prepare_token_file(path: Path) -> dict[str, object]:
     path = path.expanduser().absolute()
     skill_root = Path(__file__).resolve().parents[1]
     if path.is_symlink():
@@ -23,11 +23,7 @@ def prepare_token_file(path: Path, kind: str = "mcp") -> dict[str, object]:
         if not path.is_file():
             raise ValueError("The selected path is not a regular file.")
         return {"path": str(path), "created": False, "status": "existing_file_preserved"}
-    template_name = (
-        "creative-machine-download.env.example" if kind == "download"
-        else "creative-machine-token.env.example"
-    )
-    template = (skill_root / "assets" / template_name).read_bytes()
+    template = (skill_root / "assets" / "creative-machine-token.env.example").read_bytes()
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     try:
         fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -35,20 +31,16 @@ def prepare_token_file(path: Path, kind: str = "mcp") -> dict[str, object]:
         raise ValueError("The file appeared during setup; inspect its path before continuing.") from None
     with os.fdopen(fd, "wb") as output:
         output.write(template)
-    status = "awaiting_credentials" if kind == "download" else "awaiting_token"
-    return {"path": str(path), "created": True, "status": status}
+    return {"path": str(path), "created": True, "status": "awaiting_token"}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--kind", choices=["mcp", "download"], default="mcp")
     parser.add_argument("--path", type=Path)
     args = parser.parse_args()
     try:
-        path = args.path or Path.home() / ".config" / "creative-machine" / (
-            "download.env" if args.kind == "download" else "token.env"
-        )
-        result = prepare_token_file(path, args.kind)
+        path = args.path or Path.home() / ".config" / "creative-machine" / "token.env"
+        result = prepare_token_file(path)
     except (OSError, ValueError) as exc:
         print(json.dumps({"status": "file_not_prepared", "error": str(exc)}, ensure_ascii=False))
         return 1
