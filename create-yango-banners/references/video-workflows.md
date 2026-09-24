@@ -4,13 +4,13 @@ Use this MCP's current `get_video_capabilities` and typed tools. The service wri
 
 ## Gather a complete setup
 
-Read capabilities and collect the following choices from the request and attachments. Ask one concise grouped question for missing material choices; offer service defaults (10 seconds, PERF, Balanced) when useful. Preserve explicit choices. Do not ask again for information already given. Explain optional references and allow an explicit “none”; do not silently discard attached files or assume every image is a portrait.
+Read capabilities and collect the following choices from the request and attachments. Ask one concise grouped question for missing material choices. You may offer 10 seconds and Balanced dynamics when useful. **For every new video request without a stated format, ask the user to choose PERF or SMM before writing a prompt or submitting a video. There is no format default.** Preserve explicit choices. Do not ask again for information already given. Explain optional references and allow an explicit “none”; do not silently discard attached files or assume every image is a portrait.
 
 | Choice | Exact field / values |
 | --- | --- |
 | Mode | `mode`: `ugc` for a spoken testimonial; `standard-story` for a human narrative; `rida-story` for RIDA zebras |
 | Duration | `durationSeconds`: **10, 15, 20, 25, 30**, required in every modern mode |
-| Format | `outputType`: `performance` = square 1:1, `smm` = vertical 9:16; native 1080p |
+| Format | Required explicit choice: PERF maps to `outputType="performance"` = square 1:1; SMM maps to `outputType="smm"` = vertical 9:16; native 1080p. Ask when unspecified; do not infer from destination, mode or examples |
 | Dynamics | `videoDynamics`: **0 Melodrama, 1 Drama, 2 Balanced, 3 Adventure, 4 Action**; changes writing, pacing and camerawork |
 | Human casting | `country`, `role` (`user`/`driver`), `gender` (`women`/`men`, required without a portrait), `age` (integer **18–70**, required without a selected portrait), `portraitImageUrl` if keeping a supplied/chosen identity |
 | Vehicle | `transportLabel`: exact class label for the selected country from `get_source_catalog(catalog="vehicles")`; omit for no catalogue vehicle. Country/class selects the real approved livery and moto helmet, not a made-up car reference |
@@ -20,6 +20,8 @@ Read capabilities and collect the following choices from the request and attachm
 | Phone screen | UGC `screenReferenceType` + `screenReferenceUrl`; Story `screenImageUrl`; RIDA `ridaInterfaceImageUrl` |
 
 Use `get_source_catalog(catalog="ridehail-branding")` to inspect the service's current approved vehicle references. For custom `brandingImageUrl`, omit `transportLabel`: a selected catalogue class overrides custom branding at the API. Tell the user when their requested custom livery conflicts with that choice. When selecting Oman transport, provide gender even with a portrait: the service uses it to select the correct approved livery. Treat portrait identity as authoritative; do not describe a different age or gender than the selected person.
+
+Illustrative Ghana UGC format mapping: after confirming the live Ghana tariff label is `Moto`, a user-selected PERF format gives `mode="ugc"`, `country="Ghana"`, `transportLabel="Moto"`, `outputType="performance"` (square 1:1). A user-selected SMM format changes only `outputType` to `"smm"` (vertical 9:16). This is a partial setup, not a call: obtain the actual user's age and gender (or selected portrait), setting, speech or uploaded audio, duration, dynamics and explicit merchandise choice before building complete settings.
 
 Before writing, briefly show the selected setup, including merch and each attachment's role. This is a reviewable description, not an extra permission gate when the user has already authorized the work. Ask about actual ambiguity rather than inserting invented defaults for casting, speech or attachment roles.
 
