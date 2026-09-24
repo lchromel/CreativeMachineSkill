@@ -1,6 +1,6 @@
 ---
 name: create-yango-banners
-description: Create and revise Yango Creative Machine images, performance and CRM banners, automotive and UGC videos, and creative experiments. Use for Yango-family services including Garage and scooters, image glitch repair, editable builder links, media libraries, archives, and requested Yandex Disk sharing exclusively through Yango Creative Machine MCP. Also use for MCP installation, missing-token errors and connection repair; prepare a linked token file when needed before pausing media work.
+description: Create and revise Yango Creative Machine images, performance and CRM banners, Story, UGC and RIDA videos, and creative experiments. Use for Yango-family services including Garage and scooters, image glitch repair, editable builder links, media libraries, archives, and requested Yandex Disk sharing exclusively through Yango Creative Machine MCP. Also use for MCP installation, missing-token errors and connection repair; prepare a linked token file when needed before pausing media work.
 ---
 
 # Create Yango Creatives
@@ -144,7 +144,7 @@ Report completion only after the required MCP tool succeeds. Include a short pro
 - `get_source_catalog` reads current `vehicles`, `garage`, or `glitch-repairs` options from the generator. Use the catalogue for exact country/city/car combinations, tariffs and repair IDs.
 - `get_operation_contract()` lists advanced tools. Call it with `tool_name` before an unfamiliar operation to see its native request fields and defaults. Advanced tools take a `payload` object with the upstream field names, commonly camelCase; convenience tools take snake_case arguments.
 - For source generation, first read [service inputs](references/service-inputs.md). For mode controls, Garage, scooters, countryside scenes, glitch repair or experiments, read [image workflows](references/image-workflows.md).
-- For Standard/UGC video, storyboards, reference uploads and branded exports, read [video workflows](references/video-workflows.md).
+- For video, first read [video workflows](references/video-workflows.md) and call `get_video_capabilities`. Use typed `write_video_prompt` → `submit_video` with identical settings and the returned digest. Collect duration, format, dynamics, casting, transport, merch and each attachment role explicitly. After success, show the video and offer `edit_video` for logo, packshot, copy, disclaimers and subtitles; apply already-requested editing without another generation.
 - For multiple source images, detailed performance/CRM options, native render matrices, library operations or builder state serialization, read [advanced API](references/advanced-api.md).
 
 ## Handle queued operations
@@ -156,7 +156,7 @@ Convenience image/render tools wait for their results. Advanced generation, edit
 3. On `failed` or `interrupted`, inspect `error` and `can_resume`. When `can_resume` is true and continuation is authorized, call `resume_operation` with `payload.operationId` and the original `operation_client_id`. This continues the known video task.
 4. After an ambiguous submission timeout, use `list_operation_jobs` with the owner ID reported in the error. After a status timeout, retry only the status read. Never create a new paid generation merely because the connection was lost.
 5. Caller-supplied `request_id` requires the original `operation_client_id`; an authorized submission retry must retain both IDs and the exact payload. Do not repurpose the key for changed inputs.
-6. Older video/storyboard APIs can return a separate `job_id`; follow it with `get_video_generation_job` or `get_video_storyboard_job` using `parameters.jobId`.
+6. In account mode, use the outer operation result for video completion; legacy job endpoints are unavailable even if result metadata includes a `job_id`. Preserve the finished video and offer Edit.
 
 ## Keep audience, source style and carrier separate
 
