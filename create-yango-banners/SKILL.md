@@ -1,6 +1,7 @@
 ---
 name: create-yango-banners
-description: Create and revise Yango Creative Machine images, performance and CRM banners, Story, UGC and RIDA videos, and creative experiments. Use for Yango-family services including Garage and scooters, image glitch repair, editable builder links, media libraries, archives, and requested Yandex Disk sharing exclusively through Yango Creative Machine MCP. Also use for MCP installation, missing-token errors and connection repair; prepare a linked token file when needed before pausing media work.
+disable-model-invocation: false
+description: Create and revise Yango Creative Machine images, performance and CRM banners, Story, UGC and RIDA videos, and creative experiments. Use for Yango-family services including Garage, CIS/Yango Scooters, Power, Beri Zaryad and City to City, icons, layer editing, image glitch repair, editable builder links, media libraries, archives, and requested Yandex Disk sharing exclusively through Yango Creative Machine MCP. Also use for MCP installation, missing-token errors and connection repair; prepare a linked token file when needed before pausing media work.
 ---
 
 # Create Yango Creatives
@@ -106,6 +107,8 @@ Example after a choice: «Выделяю “первые 3 поездки” ц�
 
 ## Balance line breaks and size short headlines
 
+Read [banner typography](references/banner-typography.md) when composing or revising banner copy. It adapts Jakub Krehel's `better-typography` guidance on balanced headings, short last lines and unbroken offer labels to the MCP renderer. Inspect actual outputs; manual line breaks alone do not prove the result is balanced.
+
 Treat line breaks and headline size as part of composition; handle them without another interview unless the user specifies them. Preserve the approved words, offer conditions, disclaimer and inline emphasis. Build headline/subtitle values as actual multiline strings. Let the tool/JSON serializer escape line breaks once; do not pre-escape them or paste backslash-n characters into the text. MCP normalizes accidental literal newline escapes in banner copy and saved editor fields, but the intended input is real multiline text. Keep Unicode and inline emphasis intact; do not use a general escape decoder or HTML tags. Break at phrase boundaries to make lines reasonably similar in visual width and avoid a long first line with a lone short word below. Keep numbers with their units and qualifiers with their offers. Visual width matters more than equal character counts; do not distort the sentence merely to make identical line lengths. Keep a short phrase on one line if it fits.
 
 Complete two-line headline example (the newline below is part of the value):
@@ -158,6 +161,10 @@ Convenience image/render tools wait for their results. Advanced generation, edit
 5. Caller-supplied `request_id` requires the original `operation_client_id`; an authorized submission retry must retain both IDs and the exact payload. Do not repurpose the key for changed inputs.
 6. In account mode, use the outer operation result for video completion; legacy job endpoints are unavailable even if result metadata includes a `job_id`. Preserve the finished video and offer Edit.
 
+## Current CRM controls
+
+Read [CRM controls](references/crm-controls.md) for Go offers, Business branding, shared legal copy, Tall ticket, Go Stories, Bottom Sheet and Promo card mark position. Use typed convenience fields when available; preserve these fields through both the render payload and editable settings. Brand, service, mark mode, placement and source style remain separate choices.
+
 ## Keep audience, source style and carrier separate
 
 Choose the intended recipient before rendering. Driver communication includes earnings, fleet and Yango Pro tasks; showing a driver in a passenger advertisement does not make the audience drivers. The `drivers` image style controls photography only.
@@ -198,9 +205,9 @@ Verify that the badge follows the copy block and does not overlap the logo or di
 1. Reuse a provided public/Yango source URL unchanged. For local/attached JPEG, PNG or WebP up to 20 MB, call `upload_source_image` with Base64 data; local paths are not remote URLs.
 2. Inspect generated/edited sources when image inspection is available: requested subject and vehicle, identity, setting, action and references. Judge copy fit on the rendered banner; adjust native crop/layout controls with the same source when needed.
 3. Use `render_banner_pack` for performance. Each copy variation is a text set; default to the four performance sizes when unspecified.
-4. Use `render_in_app_pack` for CRM. Its omitted placements default only to consumers. Driver placements are `drivers-fleet-room-preview`, `drivers-stories-showcase`, `drivers-stories`, `drivers-full-screen`, `drivers-feed`, `drivers-fleet-room-story`, `drivers-whatsapp`, `drivers-tg-chats`, `drivers-tg-post`, `drivers-tg-stories`, and `drivers-mail`.
+4. Use `render_in_app_pack` for CRM. Its omitted placements default only to consumers. Driver placements are `drivers-bottom-sheet`, `drivers-fleet-room-preview`, `drivers-stories-showcase`, `drivers-stories`, `drivers-full-screen`, `drivers-feed`, `drivers-fleet-room-story`, `drivers-whatsapp`, `drivers-tg-chats`, `drivers-tg-post`, `drivers-tg-stories`, and `drivers-mail`.
 5. For Yandex Go B2B, use brand `yandex-go-b2b`, layout `frame`, a locale from capabilities, and the desired `text_sets[].accent_color`. One editable pack uses one palette; use separate packs for different colors.
-6. Use a left-side icon when CRM badge text is empty; a labeled badge requires text. A CRM price badge is separate from the service badge.
+6. Use an icon when ordinary CRM badge text is empty; a labeled badge requires text. For Go Icon + offer use `go_offer.mode="offer"`, not a separate CRM price badge. Left/Center/Right aligns the complete mark group.
 7. Start image positioning at 100% and zero shift. Positive X moves right; positive Y moves down; shifts use 50-pixel increments. Use per-output overrides when one global crop cannot fit the pack.
 8. Performance badge shifts are 0–100 in steps of 5; scale is 70–150% in steps of 5. Set defaults on the text set and individual-size values through `badge_overrides`. Revisions use `performance_badge_overrides`. `badge_small_text_position` chooses top/bottom; CRM revisions expose independent `price_badge_*` fields.
 9. Re-render the same source after positioning changes; avoid another paid generation solely for crop adjustments.

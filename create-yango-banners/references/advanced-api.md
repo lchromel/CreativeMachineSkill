@@ -69,3 +69,16 @@ Use convenience render/revision tools when their fields cover the request; they 
 - `upload_image_advanced` supports the native upload metadata/purpose fields; ordinary attachments use the validated `upload_source_image` convenience tool.
 
 Archives accept returned URLs and, where supported, `{url, folder, name}` entries. Pass actual backend paths; never turn a guessed filename into an asset URL. Yandex Disk publishing remains an explicit user-requested operation.
+
+## Current CRM fields and output geometry
+
+See [CRM controls](crm-controls.md) for native Go/Business, Promo card and shared
+legal fields. Preserve these in native render and matching builder settings.
+`goOffer` is an object; `businessPillLanguage` can be explicit without a country.
+`promoBadgePosition` is saved globally, and the selected Promo card placement
+receives `badgePosition`. Only Yango Fullscreen uses `fullscreenBadgeSide` as its
+placement `badgeSide`; Go/Business share the global alignment.
+
+`preview_layout` and per-output `source_image_url` are additive renderer metadata.
+They do not replace actual image previews or require browser-side final rendering.
+Tall ticket retains the original source even when other placements use an uncrop.

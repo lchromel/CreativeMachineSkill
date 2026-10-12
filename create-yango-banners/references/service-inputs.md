@@ -85,3 +85,29 @@ Image Edit takes an existing image plus the specific requested change; it does n
 ## Audit basis
 
 Checked against the generator's `/api/generate-image` handler and its mode-specific services, `app.js` request construction, `call_openai`, `call_driver_openai`, automotive/illustration/scooter/RIDA/Lucky prompt writers and `garage_catalog.garage_prompt`. The runtime capability response's `source_input_contract` is the compact field map. Visual quality remains stochastic; matching input fields proves routing parity, not identical pixels across runs.
+
+## Additional service modes
+
+All these services use stable service keys, not translated UI labels. Read
+`additional_image_modes`, `business_3d`, `icons` and `power_stations` in capabilities.
+
+| Service / style | Required inputs and dedicated controls | Brief fallback |
+| --- | --- | --- |
+| `rides-for-business` / `3d` | Subject in Situation, approved CIS Business country; `business_background_color` is `#FFFD72` or `#081331`. No tariff/car required. | Situation. |
+| `ride-hailing` / `3d-icon`, `3d-icon-playful` | Object in Situation; `icon_angles` is isometric and/or near-side, default both. One output per distinct view (count derived). Up to four uploaded PNG content refs in `icon_reference_image_urls`; generator supplies style refs. | Situation. |
+| `beri-zaryad-go` / `beri-zaryad-3d`, `beri-zaryad-photo` | CIS country; `beri_zaryad_options` controls solid/gradient background, photo compositions and refs. 3D requires Situation; Photo Hero/Situation optional. | Photo Hero; 3D Situation. |
+| `power` / `power-3d`, `power-photo` | Oman/UAE/Colombia, `power_options.station_id` from capabilities, solid/gradient background and photo refs/compositions. 3D requires Situation. | Photo Hero; 3D Situation. |
+| `scooters-yango` / `scooter-3d-2`, `scooter-photo` | Colombia/Peru/UAE; existing `scooter_options` for creative mode and photo references/compositions. Required 3D Situation. `count` controls total, rather than CIS `scooter_options.concept_count`. | Photo Hero; 3D Situation. |
+| `city-to-city-cis` / `city-to-city-3d`, `city-to-city-photo`, `city-to-city-cinematic-3d` | Kazakhstan/Kyrgyzstan/Uzbekistan/Georgia/Armenia; required Situation for all styles. `city_to_city_options` sets yellow/yellow-gradient/purple-gradient, photo compositions and refs. | Situation. |
+
+Beri/Power/Yango Scooters/City to City accept 1–4 images per call. For Photo,
+select distinct compositions and enough images to cover them; never silently
+increase the requested count. The typed options list their exact presets.
+Beri/Power photo composition/location refs are not Reference Scene inputs.
+Yango Scooters and CIS `scooters` are different services with different references.
+
+Vehicle/tariff data, including Mauritania and Electro options, comes from the live
+catalogue; do not copy an old static list into a brief. Kazakhstan ordinary taxi
+wordmark/emblem and Electro use distinct approved references; backend composition
+and selected tariff decide which applies. Do not attach ordinary taxi branding to
+Electro or force vehicle branding into a composition where the vehicle is absent.

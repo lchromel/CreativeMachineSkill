@@ -41,7 +41,7 @@ For separate scenes, call `generate_source_image` once per direction with `count
 
 Render each returned source as its own creative. Reuse it for its sizes, selected layouts and CRM text/clean variants. A change of crop or headline alone does not count as another visual concept when different scenes were requested.
 
-## Scooters
+## CIS Scooters
 
 Active UI styles are `scooter-3d-2`, `scooter-cinematic-3d` and `scooter-photo`. Cinematic offer generation uses `scooter-cinematic-3d-offer` and requires the exact offer. Older `scooter-3d` and `scooter-3d-offer` routes remain available for compatibility.
 
@@ -64,3 +64,28 @@ For selected glitch categories or expanded image repair:
 `analyze_banner_experiment` takes `imageUrl`, optional brand/country/service, and count (1–6). It returns diagnosis, extracted copy, text sets, hypotheses and image-edit prompts. Review those against the user's intended test.
 
 To generate from that analysis, call `generate_banner_experiment_images` with the source/context and the returned fields at the payload root: `text_sets`, `hypotheses`, `image_edit_prompts`, `extracted`, `diagnosis`, `renderer_constraints_used`, `visual_summary`. Do not wrap them in an invented `analysis` object. `remix_banner_experiment` combines analysis and image generation when the complete experiment is requested. Render the returned editable copy/source variants through the appropriate banner workflow.
+
+## New service modes and Icons
+
+Use [service inputs](service-inputs.md#additional-service-modes) and live capability
+schemas for Business 3D, Flare/Playful icons, Beri Zaryad, Power, Yango Scooters and
+City to City. The separate Icons web workspace still routes through `ride-hailing`
+with `3d-icon`/`3d-icon-playful`; it is not a passenger Photo style. Upload requested
+PNG content references first and pass their actual generator URLs. Keep internal
+style references under generator control.
+
+
+Export selected finished transparent icons only when download/export is requested.
+Call `export_3d_icons` with native `imageUrls` entries containing each actual `url`
+and its `angle` (isometric/near-side), `placement="map"` (80px) or `"promo"` (40px),
+and matching `styleId`. It packages existing sources at the generator's density
+variants; it does not regenerate. The adapter accepts its own absolute result URLs
+and converts them to the backend's local PNG form. Keep the returned ZIP and task IDs.
+
+For requested layer editing, discover `separate_seedream_layers`,
+`edit_seedream_layer`, `compose_seedream_layers` with `get_operation_contract`.
+Separate using the actual `imageUrl`; retain returned layer URLs and geometry.
+Edit the selected saved `layerImageUrl` with the complete requested `prompt`, then
+compose `baseImageUrl` plus the native `layers` and optional `crop`. Separation and
+layer editing may incur charges; inspect/poll the existing operation before retrying.
+Do not substitute local composition or regenerate all layers to change one object.
