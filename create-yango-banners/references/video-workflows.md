@@ -62,6 +62,8 @@ For safe retries you may supply `operation_client_id` (32 lowercase hexadecimal 
 
 Use **`edit_video(settings=...)`** with the successful raw **`videoUrl`**. This reuses the existing video. Gather branding placement, final message and subtitle choice; do not silently render the default Yango logo for another brand.
 
+Reuse the source URL returned by generation or the video library: editing accepts both `/output/...` paths and full HTTP(S) links on this generator's origin. The MCP converts displayed links to local paths for editing, scene detection, replacement previews and fragment repair, including nested replacement URLs. A source must still have a matching record in the library available to the account; opening an MP4 link proves file access, not editability. Use source links without query strings or fragments. External videos need an authorized upload first.
+
 | Field | Values / behavior |
 | --- | --- |
 | `videoUrl` | Existing generated or uploaded video library URL |
@@ -81,6 +83,18 @@ Use **`edit_video(settings=...)`** with the successful raw **`videoUrl`**. This 
 RIDA uses the supplied two-second outro: `append-1` is unavailable with `rida-logo`/`rida-icon`; choose `append`, `overlay` or `none`.
 
 Poll the edit operation and show its successful deliverables. Preserve both the raw original and edited versions. Automatic subtitles may incur transcription cost; editing does not restart Seedance generation.
+
+When subtitles were requested, explicitly send `autoSubtitles=true` for automatic transcription, or `autoSubtitles=false` with the complete `subtitleCues` array for manual text and timing. An omitted `autoSubtitles` is false in the typed editing tool; subtitle creation is not implied by adding a logo or packshot.
+
+### Diagnose a failed edit
+
+Read the original task with `get_operation_job(parameters={"id": operation_id}, operation_client_id=...)`, preserving the IDs returned at submission. Report its actual `route`, `http_status` and `error` when available. Generation, editing, status reads and MP4 downloads are separate operations.
+
+- `Video not found` from an edit means the library lookup failed. Check `list_library_videos`, including pagination when needed, and compare the source's `/output/...` path with its library record under the same account. Resolve a missing record or account mismatch before submitting another edit. If that record exists but only the full link fails, check the deployed MCP/server versions: older versions compared absolute and relative URLs as different strings.
+- `Task not found` from a status read calls for checking the original operation and owner IDs. Read status again with the correct IDs rather than starting a replacement task.
+- A generic or non-JSON 404 is insufficient to identify the missing resource. Retain the failing tool, route and complete error; distinguish a missing API route from a missing library record or task. A working download link does not establish which of these failed.
+
+Return a raw source as a source when requested. Describe subtitles and packshot as complete only after a successful edit has returned its deliverables; an edit failure is not a reason to regenerate the video.
 
 For a requested pixel/content repair, use `repair_video_fragment(settings={videoUrl,selection:[start,end],prompt,referenceImageUrls})`. This **does** start a paid video operation. Select 0.1–30 seconds from a library source of at least 4 seconds; attach at most 8 previously uploaded images. @Video1 denotes the source, @Image1..N follow that list. The service adds context for short selections and checks returned timing. A failed repair must not be blindly retried. Preview the returned fragment with `preview_video_replacement(video_url,replacement)` before a requested export. `detect_video_scenes(video_url)` finds cuts in existing videos up to 300 seconds without an AI provider call.
 
