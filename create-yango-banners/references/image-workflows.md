@@ -74,13 +74,63 @@ with `3d-icon`/`3d-icon-playful`; it is not a passenger Photo style. Upload requ
 PNG content references first and pass their actual generator URLs. Keep internal
 style references under generator control.
 
+Choose the placement before generation. If the request does not identify it, ask
+whether the user needs a map object or a promo plaque; do not generate both views
+as a default. A promo plaque here is an Icons asset, separate from a CRM Promo card.
 
-Export selected finished transparent icons only when download/export is requested.
-Call `export_3d_icons` with native `imageUrls` entries containing each actual `url`
-and its `angle` (isometric/near-side), `placement="map"` (80px) or `"promo"` (40px),
-and matching `styleId`. It packages existing sources at the generator's density
-variants; it does not regenerate. The adapter accepts its own absolute result URLs
-and converts them to the backend's local PNG form. Keep the returned ZIP and task IDs.
+| Placement | Typed `icon_placement` | Required native angle | Base canvas |
+| --- | --- | --- | --- |
+| Object on the map | `map` | `isometric`: three-quarter view from slightly above | 80×80 px |
+| Promo plaque | `promo` | `near-side`: straight level elevation, orthographic camera, no downward pitch | 40×40 px |
+
+Call `generate_source_image` with `service="ride-hailing"`, the requested
+`style="3d-icon"` (Flare) or `"3d-icon-playful"`, `icon_placement`, and the object
+in `situation_description`. Leave `icon_angles` unset; it is only a compatibility
+field and must match the placement's single angle if provided. One image is
+generated per placement per call. If both carriers are explicitly requested, use
+two calls. Advanced `generate_image_advanced` uses the MCP field `iconPlacement`;
+MCP translates it into native `iconAngles` and `count=1`. Conflicts fail before any
+paid submission. Preserve the returned style, placement and angle metadata.
+
+For an edit, use `edit_source_image(source_image_url=ACTUAL_PNG_URL,
+edit_prompt=FULL_ENGLISH_EDIT_PROMPT, style=ORIGINAL_STYLE,
+icon_placement=ORIGINAL_PLACEMENT)`. Keep the original style and placement from
+metadata through every subsequent edit. The MCP passes `styleId` to native
+`/api/edit-image`, which selects the same `gpt-image-2.5-flare` model as generation,
+with `background="transparent"`, PNG output and the original RGBA source. Camera,
+style, silhouette transparency and subtle contact shadow must survive. Advanced
+`edit_image_advanced` requires original `styleId` and MCP `iconPlacement`. Do not use
+expanded modes, glitch repair, layer editing or generic regeneration for Icons;
+those routes do not guarantee the same model and alpha workflow. Provide the full
+English prompt whenever revising it, including the placement requirements.
+
+Export selected finished originals **or edited PNGs** only when download/export
+is requested. Use `export_3d_icons` with exactly one `imageUrls` entry containing
+the actual `url` and its original `angle`, the same `placement`, and explicit
+matching `styleId`. Map rejects near-side; promo rejects isometric. To export
+both placements, call separately. No extra generation or local image conversion.
+Absolute result URLs from this generator are normalized to local PNG paths.
+
+The native ZIP must contain exactly eight square RGBA PNGs per selected icon:
+
+| Suffix | Density | Map canvas | Promo canvas |
+| --- | --- | --- | --- |
+| `-mdpi` | 1× | 80×80 | 40×40 |
+| `-hdpi` | 1.5× | 120×120 | 60×60 |
+| `-xdpi` | 2× | 160×160 | 80×80 |
+| `-xxdpi` | 3× | 240×240 | 120×120 |
+| `-xxxdpi` | 4× | 320×320 | 160×160 |
+| `@1x` | 1× | 80×80 | 40×40 |
+| `@2x` | 2× | 160×160 | 80×80 |
+| `@3x` | 3× | 240×240 | 120×120 |
+
+The generator fits proportionally and centers the object and shadow on transparent
+padding. Preserve native filenames `{placement}-{styleId}-{angle}{suffix}.png`,
+including `-xdpi` exactly as the product names it. Do not use banner export or
+invent different density names. Keep the returned ZIP and task IDs, poll queued
+operations to completion, and verify archive names, all eight canvas sizes and
+real alpha before claiming compliance. Opaque or fully transparent assets must
+fail rather than be delivered as successful Icons exports.
 
 For requested layer editing, discover `separate_seedream_layers`,
 `edit_seedream_layer`, `compose_seedream_layers` with `get_operation_contract`.

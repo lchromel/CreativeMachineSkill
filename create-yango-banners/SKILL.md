@@ -215,6 +215,17 @@ Verify that the badge follows the copy block and does not overlap the logo or di
 
 ## CRM exports: with text and without text together
 
+CRM **map objects and promo plaques** belong to the separate **Icons** workflow,
+not banner rendering. Read [Icons generation, editing and export](references/image-workflows.md#new-service-modes-and-icons).
+Require `icon_placement="map"` for isometric only or `"promo"` for the straight,
+level near-side view only. Generate one placement per call; never default to both
+angles. Keep the original `3d-icon` / `3d-icon-playful` style and placement in every
+`edit_source_image` call so generation and editing both use `gpt-image-2.5-flare`
+with true alpha PNG. Export selected originals **or edited results** through
+`export_3d_icons` with the same placement, angle and style, strictly using native
+80px/40px bases and all eight density variants. No generic CRM banner ZIP or
+with-text/without-text pair applies to these Icons assets.
+
 By default, deliver BOTH variants for every requested CRM image/placement: **with text** and **without text**. This is the normal export, not a choice to ask the user about. `render_in_app_pack` and CRM `revise_banner_from_edit_link` calls now include both when `include_textless` is omitted/true. Each returned banner has `variant: "with_text"` or `"without_text"`; the common ZIP separates them into those two folders. Show both variant groups as previews; create the combined archive only when export is requested. Set `include_textless=false` only if the user explicitly requests with-text only. For explicitly clean-only output use the native CRM workflow.
 
 The clean variant uses the generator's native `hideTextAndBadges=true`: overlay text, disclaimers and badges are hidden; source imagery, crops, placement sizes and layout treatment are retained. Do not remove text by editing the source image, blank the saved copy, or switch `fade` to `no-fade`. Baked-in text inside a source is not removed by this switch. The editable link preserves the filled text and badge settings; it does not pretend to save a separate clean-mode toggle.
